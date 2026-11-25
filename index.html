@@ -127,6 +127,14 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .nedit{margin-top:8px}.nedit textarea{width:100%;min-height:150px;resize:vertical;font:15px/1.4 Inter,sans-serif;padding:9px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box}
 .nrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center}
 .lastnote{margin:10px 0 0;font-size:14px;background:var(--blush);border-radius:10px;padding:8px 10px;white-space:pre-wrap}.lastnote b{color:var(--berry)}
+.cform{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}.cform .full{grid-column:1/-1}
+.cform input,.cform select{width:100%;box-sizing:border-box}
+.bdrow{display:grid;grid-template-columns:5.5em 1fr 5.5em;gap:8px}
+.bdays{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#fff6db;border:1px solid #f0d78a;font-size:15px}
+.bdlist{margin:10px 0;padding:10px 12px;border-radius:12px;background:#fff6db;border:1px solid #f0d78a}
+.bdi{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;background:none;padding:8px 2px;border-top:1px solid #f0e2b0;cursor:pointer;color:var(--ink);text-align:left;font-size:15px}
+.bdi small{color:var(--mut)}.bdi .today{color:var(--berry);font-weight:700}
+.bdnote{margin:10px 0;padding:8px 12px;border-radius:10px;background:#fff6db;border:1px solid #f0d78a;font-weight:600}
 .cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
 .linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
 .linkish:hover b{text-decoration:underline}
@@ -197,6 +205,7 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 <section id="v-day">
   <div class="dayhead"><h2 id="dayTitle"></h2><div class="nav2"><button class="btn ghost" id="prev" aria-label="Previous day">‹</button><input type="date" id="dayPick" style="width:auto"><button class="btn ghost" id="next" aria-label="Next day">›</button><button class="btn ghost" id="today">Today</button></div></div>
   <div class="strip" id="dayStrip"></div>
+  <p id="dayBdays" class="bdays" hidden></p>
   <div class="cols">
     <div class="page" id="dayPage"></div>
     <form class="card" id="addForm">
@@ -218,7 +227,7 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 </section>
 <section id="v-clients" hidden>
   <div class="cl">
-    <div class="card clist"><h3>Clients</h3><input id="cSearch" type="search" placeholder="Search name or phone" autocomplete="off" aria-label="Search clients"><p class="note" id="cCount"></p><div id="cList" class="cscroll"></div></div>
+    <div class="card clist"><div class="chead"><h3>Clients</h3><button type="button" class="btn" id="cNew">+ New client</button></div><div id="cBdays" class="bdlist" hidden></div><input id="cSearch" type="search" placeholder="Search name or phone" autocomplete="off" aria-label="Search clients"><p class="note" id="cCount"></p><div id="cList" class="cscroll"></div></div>
     <div id="cDetail" class="card"><p class="note">Pick a client to see their history.</p></div>
   </div>
 </section>
@@ -364,16 +373,28 @@ window.addEventListener('online', flush);
 const svcBy = c => S.services.find(s => s.code === c);
 const norm = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
 const clientById = id => (S.clients || []).find(c => c.id === id);
-const clientByName = n => (S.clients || []).find(c => norm(c.name) === norm(n));
+const fullName = c => [c.name, c.surname].filter(Boolean).join(' ');
+const clientByName = n => (S.clients || []).find(c => norm(fullName(c)) === norm(n)) || (S.clients || []).find(c => !c.surname && norm(c.name) === norm(n));
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function bdParts(b) { const m = String(b || '').match(/^(?:(\d{4})-)?(\d{2})-(\d{2})$/); return m ? { y: m[1] ? +m[1] : 0, m: +m[2], d: +m[3] } : null; }
+function bdText(b) { const p = bdParts(b); return p ? `${p.d} ${MONTHS[p.m - 1]}${p.y ? ' ' + p.y : ''}` : ''; }
+function bdNext(b) {   // days until the next birthday (0 = today) and the age they turn
+  const p = bdParts(b); if (!p) return null;
+  const t = new Date(TODAY() + 'T12:00:00'); let n = new Date(t.getFullYear(), p.m - 1, p.d, 12);
+  if (n < t) n = new Date(t.getFullYear() + 1, p.m - 1, p.d, 12);
+  return { days: Math.round((n - t) / 864e5), age: p.y ? n.getFullYear() - p.y : 0, date: localDate(n) };
+}
+function bdWhen(x) { return x.days === 0 ? 'today' : x.days === 1 ? 'tomorrow' : x.days < 7 ? 'on ' + new Date(x.date + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'long' }) : 'on ' + dshort(x.date); }
+function upcomingBdays(within) { return (S.clients || []).map(c => ({ c, x: bdNext(c.birthday) })).filter(o => o.x && o.x.days <= within).sort((a, b) => a.x.days - b.x.days); }
 function resolveClient(name) {
   const n = String(name || '').trim();
   if (!n || norm(n) === 'walk-in') return '';
   const c = clientByName(n); if (c) return c.id;
-  const nc = { id: 'C' + newId().slice(1), name: n, phone: '', notes: '', created: TODAY() };
+  const parts = n.split(/\s+/), nc = { id: 'C' + newId().slice(1), name: parts.shift(), surname: parts.join(' '), phone: '', birthday: '', notes: '', created: TODAY() };
   S.clients = S.clients || []; S.clients.push(nc); queue('addClient', nc);
   return nc.id;
 }
-function visitsOf(c) { return S.sales.filter(x => x.clientId ? x.clientId === c.id : norm(x.client) === norm(c.name)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); }
+function visitsOf(c) { return S.sales.filter(x => x.clientId ? x.clientId === c.id : (norm(x.client) === norm(fullName(c)) || (!c.surname && norm(x.client) === norm(c.name)))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); }
 function lastVisitText(c) { const v = visitsOf(c).find(x => x.kind === 'svc'); return v ? `${dshort(v.date)}: ${v.codes.join('+')} (${R(v.amount)})` : 'no visits yet'; }
 const prodBy = c => S.products.find(p => p.code === c);
 const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
@@ -404,7 +425,10 @@ function renderDay() {
   $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
     : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
   chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
-  $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(c.name)}">${esc(c.phone)}</option>`).join('');
+  $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(fullName(c))}">${esc(c.phone)}</option>`).join('');
+  const ub = upcomingBdays(7);
+  $('dayBdays').hidden = !ub.length;
+  $('dayBdays').innerHTML = ub.length ? '🎂 Birthdays: ' + ub.map(o => `<button type="button" class="linkish" data-open="${esc(o.c.id)}"><b>${esc(fullName(o.c))}</b></button> ${esc(bdWhen(o.x))}${o.x.age ? ' (' + o.x.age + ')' : ''}`).join(' · ') : '';
   clientInfo();
   const groups = [...new Set(S.services.map(s => s.group || 'Other'))];
   chips('grpBtns', groups, 'grp');
@@ -414,7 +438,8 @@ function renderDay() {
 function clientInfo() {
   const n = $('fClient').value.trim(), c = n && clientByName(n);
   const ln = c && visitsOf(c).find(x => x.notes);
-  $('fClientInfo').textContent = !n ? '' : c ? `Last visit ${lastVisitText(c)}${c.notes ? ' · Note: ' + c.notes : ''}${ln ? ' · Last formula (' + dshort(ln.date) + '): ' + ln.notes.replace(/\n/g, ', ') : ''}` : 'New client: will be added to the client list.';
+  const bx = c && bdNext(c.birthday);
+  $('fClientInfo').textContent = !n ? '' : c ? `${bx && bx.days <= 14 ? '🎂 Birthday ' + bdWhen(bx) + '! · ' : ''}Last visit ${lastVisitText(c)}${c.notes ? ' · Note: ' + c.notes : ''}${ln ? ' · Last formula (' + dshort(ln.date) + '): ' + ln.notes.replace(/\n/g, ', ') : ''}` : 'New client: will be added to the client list. Add their phone and birthday under Clients.';
 }
 function shortName(s) { return String(s.name).replace(/^PreWash, /, '').replace(/ \(.*?\)/g, '').replace(/ \+ cut,? (style|& style|& styling)(, style)?( & toner)?/, ' +cut').slice(0, 34); }
 function formPrice() {
@@ -425,28 +450,54 @@ function formPrice() {
   $('fVary').hidden = !vary;
   $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name + (svcBy(c).varies ? ' (from ' + R(svcBy(c).price) + ')' : '')).join(' + ') : 'No service yet';
 }
+function clientForm(c) {
+  const p = bdParts(c.birthday) || { d: 0, m: 0, y: 0 };
+  return `<div class="cform">
+      <div><label for="cName">First name</label><input id="cName" value="${esc(c.name)}" autocomplete="off"></div>
+      <div><label for="cSur">Surname</label><input id="cSur" value="${esc(c.surname)}" autocomplete="off"></div>
+      <div class="full"><label for="cPhone">Phone number</label><input id="cPhone" value="${esc(c.phone)}" inputmode="tel" autocomplete="off" placeholder="e.g. 082 123 4567"></div>
+      <div class="full"><label for="bdD">Birthday <span class="note">(year is optional)</span></label>
+        <div class="bdrow"><select id="bdD" aria-label="Birthday day"><option value="">Day</option>${Array.from({ length: 31 }, (_, i) => `<option${p.d === i + 1 ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
+        <select id="bdM" aria-label="Birthday month"><option value="">Month</option>${MONTHS.map((m, i) => `<option value="${i + 1}"${p.m === i + 1 ? ' selected' : ''}>${m}</option>`).join('')}</select>
+        <input id="bdY" inputmode="numeric" maxlength="4" placeholder="Year" aria-label="Birthday year" value="${p.y || ''}"></div></div>
+      <div class="full"><label for="cNotes">Notes (allergies, preferences)</label><textarea id="cNotes" class="ta" rows="3">${esc(c.notes)}</textarea></div>
+    </div>`;
+}
+function readClientForm() {
+  const name = $('cName').value.trim(), surname = $('cSur').value.trim(), d = $('bdD').value, m = $('bdM').value, y = $('bdY').value.trim();
+  if (!name) { toast('Please type the first name'); return null; }
+  if ((d && !m) || (m && !d)) { toast('Pick both the day and the month for the birthday'); return null; }
+  if (y && !/^(19|20)\d\d$/.test(y)) { toast('The birth year must look like 1985, or leave it empty'); return null; }
+  if (d && m) { const t = new Date(2000, m - 1, d); if (t.getMonth() !== m - 1) { toast('That day does not exist in that month'); return null; } }
+  const birthday = d && m ? (y ? y + '-' : '') + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0') : '';
+  return { name, surname, phone: $('cPhone').value.trim(), birthday, notes: $('cNotes').value.trim() };
+}
 function renderClients() {
   const nt = $('nText'), draft = noteEdit && nt ? [nt.value, document.activeElement === nt] : null;
   const list = (S.clients || []).map(c => { const v = visitsOf(c); return { c, n: v.filter(x => x.kind === 'svc').length, last: v[0] ? v[0].date : '', tot: v.reduce((a, x) => a + x.amount, 0) }; });
   const q = norm(clientQ);
-  const shown = list.filter(x => !q || norm(x.c.name).includes(q) || String(x.c.phone).replace(/\s/g, '').includes(q.replace(/\s/g, ''))).sort((a, b) => b.last.localeCompare(a.last) || a.c.name.localeCompare(b.c.name));
+  const shown = list.filter(x => !q || norm(fullName(x.c)).includes(q) || String(x.c.phone).replace(/\s/g, '').includes(q.replace(/\s/g, ''))).sort((a, b) => b.last.localeCompare(a.last) || fullName(a.c).localeCompare(fullName(b.c)));
+  const ub = upcomingBdays(14);
+  $('cBdays').innerHTML = ub.length ? `<b>🎂 Birthdays in the next 2 weeks</b>` + ub.map(o => `<button type="button" class="bdi" data-cid="${esc(o.c.id)}"><span>${esc(fullName(o.c))}${o.x.age ? ' <small>turns ' + o.x.age + '</small>' : ''}</span><span class="${o.x.days === 0 ? 'today' : ''}">${esc(bdWhen(o.x))}</span></button>`).join('') : '';
+  $('cBdays').hidden = !ub.length;
   $('cCount').textContent = `${shown.length} of ${list.length} clients, most recent visit first`;
-  $('cList').innerHTML = shown.map(x => `<button type="button" class="ci" data-cid="${esc(x.c.id)}" aria-current="${x.c.id === clientSel}"><span><b>${esc(x.c.name)}</b><small>${x.n} visit${x.n === 1 ? '' : 's'}${x.last ? ' · last ' + esc(dshort(x.last)) : ''}</small></span><span class="amt">${R(x.tot)}</span></button>`).join('') || '<p class="note">No client found.</p>';
+  $('cList').innerHTML = shown.map(x => `<button type="button" class="ci" data-cid="${esc(x.c.id)}" aria-current="${x.c.id === clientSel}"><span><b>${esc(fullName(x.c))}</b><small>${x.n} visit${x.n === 1 ? '' : 's'}${x.last ? ' · last ' + esc(dshort(x.last)) : ''}</small></span><span class="amt">${R(x.tot)}</span></button>`).join('') || '<p class="note">No client found.</p>';
+  if (clientSel === 'NEW') { $('cDetail').innerHTML = `<h2>New client</h2>${clientForm({ name: '', surname: '', phone: '', birthday: '', notes: '' })}<div class="nrow" style="margin-top:12px"><button type="button" class="btn" id="cAdd">Add client</button><button type="button" class="linkish" id="cCancel">Cancel</button></div>`; return; }
   const c = clientById(clientSel);
-  if (!c) { $('cDetail').innerHTML = '<p class="note">Pick a client to see their history.</p>'; return; }
+  if (!c) { $('cDetail').innerHTML = '<p class="note">Pick a client to see their history, or add a new client.</p>'; return; }
+  const bx = bdNext(c.birthday), missing = !c.phone || !c.birthday;
   const v = visitsOf(c), svc = v.filter(x => x.kind === 'svc'), tot = v.reduce((a, x) => a + x.amount, 0);
   const fav = {}; for (const x of svc) for (const code of x.codes) fav[code] = (fav[code] || 0) + 1;
   const favTop = Object.entries(fav).sort((a, b) => b[1] - a[1])[0];
   const gaps = []; for (let i = 0; i < svc.length - 1; i++) gaps.push((new Date(svc[i].date) - new Date(svc[i + 1].date)) / 864e5);
   const every = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 0;
-  $('cDetail').innerHTML = `<div class="chead"><div><h2>${esc(c.name)}</h2><p class="note">${c.phone ? esc(c.phone) + ' · ' : ''}client since ${esc(dshort(c.created || (svc[svc.length - 1] || {}).date || TODAY()))}</p></div><button type="button" class="btn" id="bookAgain">Book again</button></div>
+  $('cDetail').innerHTML = `<div class="chead"><div><h2>${esc(fullName(c))}</h2><p class="note">${c.phone ? `<a href="tel:${esc(c.phone.replace(/\s/g, ''))}">${esc(c.phone)}</a> · ` : ''}${c.birthday ? '🎂 ' + esc(bdText(c.birthday)) + ' · ' : ''}client since ${esc(dshort(c.created || (svc[svc.length - 1] || {}).date || TODAY()))}</p></div><button type="button" class="btn" id="bookAgain">Book again</button></div>
+    ${bx && bx.days <= 14 ? `<div class="bdnote">🎂 Birthday ${esc(bdWhen(bx))}${bx.age ? ': turns ' + bx.age : ''}!</div>` : ''}
     ${c.notes ? `<div class="cnote">${esc(c.notes)}</div>` : ''}
     ${(() => { const ln = v.find(x => x.notes); return ln ? `<div class="lastnote"><b>Last visit note (${esc(dshort(ln.date))}, ${esc(ln.codes.join('+'))}):</b>\n${esc(ln.notes)}</div>` : ''; })()}
     <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${R(tot)}</b></div><div><small>Average visit</small><b>${R(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
-    <details><summary class="note" style="cursor:pointer">Edit name, phone and notes</summary>
-      <label for="cName">Name</label><input id="cName" value="${esc(c.name)}">
-      <label for="cPhone">Phone</label><input id="cPhone" value="${esc(c.phone)}" inputmode="tel">
-      <label for="cNotes">Notes (allergies, preferences, usual formula)</label><textarea id="cNotes" class="ta" rows="3">${esc(c.notes)}</textarea>
+    <details${missing ? ' open' : ''}><summary class="note" style="cursor:pointer">${missing ? 'Add ' + [!c.phone && 'phone number', !c.birthday && 'birthday'].filter(Boolean).join(' and ') : 'Edit client details'}</summary>
+      ${clientForm(c)}
       <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
     <h3 style="margin:18px 0 4px">History</h3>
     ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${R(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
@@ -521,8 +572,19 @@ function openClient(id, name) {
   render(); window.scrollTo(0, 0);
 }
 $('cSearch').oninput = e => { clientQ = e.target.value; render(); };
+$('cNew').onclick = () => { clientSel = 'NEW'; noteEdit = ''; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); const n = $('cName'); if (n) n.focus(); };
+$('cBdays').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; noteEdit = ''; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
+$('dayBdays').onclick = e => { const o = e.target.closest('[data-open]'); if (o) openClient(o.dataset.open, ''); };
 $('cList').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; noteEdit = ''; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
 $('cDetail').onclick = e => {
+  if (e.target.id === 'cCancel') { clientSel = ''; render(); return; }
+  if (e.target.id === 'cAdd') {
+    const f = readClientForm(); if (!f) return;
+    const dup = clientByName([f.name, f.surname].filter(Boolean).join(' '));
+    if (dup) { toast('That client is already in the list'); clientSel = dup.id; render(); return; }
+    const nc = { id: 'C' + newId().slice(1), ...f, created: TODAY() };
+    S.clients = S.clients || []; S.clients.push(nc); queue('addClient', nc); clientSel = nc.id; render(); toast('Client added'); return;
+  }
   const c = clientById(clientSel); if (!c) return;
   const ne = e.target.closest('[data-nedit]');
   if (ne) { noteEdit = ne.dataset.nedit; render(); const ta = $('nText'); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.style.height = Math.max(150, ta.scrollHeight + 4) + 'px'; } return; }
@@ -535,16 +597,16 @@ $('cDetail').onclick = e => {
     queue('setNote', { id: sale.id, notes: sale.notes }); noteEdit = ''; render(); toast('Note saved'); return;
   }
   if (e.target.id === 'cSave') {
-    const nm = $('cName').value.trim(); if (!nm) { toast('The name cannot be empty'); return; }
-    c.name = nm; c.phone = $('cPhone').value.trim(); c.notes = $('cNotes').value.trim();
-    queue('updateClient', { id: c.id, name: c.name, phone: c.phone, notes: c.notes }); render(); toast('Client saved');
+    const f = readClientForm(); if (!f) return;
+    Object.assign(c, f);
+    queue('updateClient', { id: c.id, ...f }); render(); toast('Client saved');
   }
   if (e.target.id === 'bookAgain') {
     const last = visitsOf(c).find(x => x.kind === 'svc');
     day = TODAY(); view = 'day';
     for (const x of $('tabs').children) x.setAttribute('aria-selected', x.dataset.v === 'day');
     for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-day';
-    $('fClient').value = c.name; $('fCodes').value = last ? last.codes.join('+') : ''; $('fTime').value = nowTime(); amtTouched = false;
+    $('fClient').value = fullName(c); $('fCodes').value = last ? last.codes.join('+') : ''; $('fTime').value = nowTime(); amtTouched = false;
     render(); const af = $('addForm'); if (af.scrollIntoView) af.scrollIntoView({ behavior: 'smooth' });
   }
 };
