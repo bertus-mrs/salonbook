@@ -121,7 +121,12 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .visit .d{font:600 15px Outfit,sans-serif;color:var(--berry);line-height:1.2}
 .visit .d small{display:block;font:400 12px Inter,sans-serif;color:var(--mut)}
 .visit .what{font-size:15px}
-.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px}
+.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px;white-space:pre-wrap}
+.nbtn{margin-top:6px;font:600 14px Inter,sans-serif;color:var(--berry);background:none;border:1px dashed var(--berry);border-radius:8px;padding:6px 10px;cursor:pointer}
+.vfull{grid-column:1/-1;margin-top:-4px}.vfull:empty{display:none}
+.nedit{margin-top:8px}.nedit textarea{width:100%;min-height:150px;resize:vertical;font:15px/1.4 Inter,sans-serif;padding:9px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box}
+.nrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.lastnote{margin:10px 0 0;font-size:14px;background:var(--blush);border-radius:10px;padding:8px 10px;white-space:pre-wrap}.lastnote b{color:var(--berry)}
 .cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
 .linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
 .linkish:hover b{text-decoration:underline}
@@ -154,7 +159,12 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .visit .d{font:600 15px Outfit,sans-serif;color:var(--berry);line-height:1.2}
 .visit .d small{display:block;font:400 12px Inter,sans-serif;color:var(--mut)}
 .visit .what{font-size:15px}
-.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px}
+.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px;white-space:pre-wrap}
+.nbtn{margin-top:6px;font:600 14px Inter,sans-serif;color:var(--berry);background:none;border:1px dashed var(--berry);border-radius:8px;padding:6px 10px;cursor:pointer}
+.vfull{grid-column:1/-1;margin-top:-4px}.vfull:empty{display:none}
+.nedit{margin-top:8px}.nedit textarea{width:100%;min-height:150px;resize:vertical;font:15px/1.4 Inter,sans-serif;padding:9px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box}
+.nrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.lastnote{margin:10px 0 0;font-size:14px;background:var(--blush);border-radius:10px;padding:8px 10px;white-space:pre-wrap}.lastnote b{color:var(--berry)}
 .cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
 .linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
 .linkish:hover b{text-decoration:underline}
@@ -292,7 +302,8 @@ let outbox = ls.get(K_OUT, []);
 let day = TODAY(), view = 'day', lastNew = '';
 const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '' };
 let amtTouched = false;
-let clientSel = '', clientQ = '';
+let clientSel = '', clientQ = '', noteEdit = '';
+const FORMULA = 'Colour/mix: \nDeveloper: \nTime on: \nResult / next time: ';
 
 /* ---------- talking to the sheet ---------- */
 async function api(action, data) {
@@ -402,7 +413,8 @@ function renderDay() {
 }
 function clientInfo() {
   const n = $('fClient').value.trim(), c = n && clientByName(n);
-  $('fClientInfo').textContent = !n ? '' : c ? `Last visit ${lastVisitText(c)}${c.notes ? ' · Note: ' + c.notes : ''}` : 'New client: will be added to the client list.';
+  const ln = c && visitsOf(c).find(x => x.notes);
+  $('fClientInfo').textContent = !n ? '' : c ? `Last visit ${lastVisitText(c)}${c.notes ? ' · Note: ' + c.notes : ''}${ln ? ' · Last formula (' + dshort(ln.date) + '): ' + ln.notes.replace(/\n/g, ', ') : ''}` : 'New client: will be added to the client list.';
 }
 function shortName(s) { return String(s.name).replace(/^PreWash, /, '').replace(/ \(.*?\)/g, '').replace(/ \+ cut,? (style|& style|& styling)(, style)?( & toner)?/, ' +cut').slice(0, 34); }
 function formPrice() {
@@ -414,6 +426,7 @@ function formPrice() {
   $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name + (svcBy(c).varies ? ' (from ' + R(svcBy(c).price) + ')' : '')).join(' + ') : 'No service yet';
 }
 function renderClients() {
+  const nt = $('nText'), draft = noteEdit && nt ? [nt.value, document.activeElement === nt] : null;
   const list = (S.clients || []).map(c => { const v = visitsOf(c); return { c, n: v.filter(x => x.kind === 'svc').length, last: v[0] ? v[0].date : '', tot: v.reduce((a, x) => a + x.amount, 0) }; });
   const q = norm(clientQ);
   const shown = list.filter(x => !q || norm(x.c.name).includes(q) || String(x.c.phone).replace(/\s/g, '').includes(q.replace(/\s/g, ''))).sort((a, b) => b.last.localeCompare(a.last) || a.c.name.localeCompare(b.c.name));
@@ -428,6 +441,7 @@ function renderClients() {
   const every = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 0;
   $('cDetail').innerHTML = `<div class="chead"><div><h2>${esc(c.name)}</h2><p class="note">${c.phone ? esc(c.phone) + ' · ' : ''}client since ${esc(dshort(c.created || (svc[svc.length - 1] || {}).date || TODAY()))}</p></div><button type="button" class="btn" id="bookAgain">Book again</button></div>
     ${c.notes ? `<div class="cnote">${esc(c.notes)}</div>` : ''}
+    ${(() => { const ln = v.find(x => x.notes); return ln ? `<div class="lastnote"><b>Last visit note (${esc(dshort(ln.date))}, ${esc(ln.codes.join('+'))}):</b>\n${esc(ln.notes)}</div>` : ''; })()}
     <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${R(tot)}</b></div><div><small>Average visit</small><b>${R(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
     <details><summary class="note" style="cursor:pointer">Edit name, phone and notes</summary>
       <label for="cName">Name</label><input id="cName" value="${esc(c.name)}">
@@ -435,7 +449,8 @@ function renderClients() {
       <label for="cNotes">Notes (allergies, preferences, usual formula)</label><textarea id="cNotes" class="ta" rows="3">${esc(c.notes)}</textarea>
       <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
     <h3 style="margin:18px 0 4px">History</h3>
-    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small>${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}</div><div class="amt">${R(x.amount)}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
+    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${R(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
+  if (draft && $('nText')) { $('nText').value = draft[0]; if (draft[1]) $('nText').focus(); }
 }
 function renderShop() {
   chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
@@ -506,9 +521,19 @@ function openClient(id, name) {
   render(); window.scrollTo(0, 0);
 }
 $('cSearch').oninput = e => { clientQ = e.target.value; render(); };
-$('cList').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
+$('cList').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; noteEdit = ''; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
 $('cDetail').onclick = e => {
   const c = clientById(clientSel); if (!c) return;
+  const ne = e.target.closest('[data-nedit]');
+  if (ne) { noteEdit = ne.dataset.nedit; render(); const ta = $('nText'); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.style.height = Math.max(150, ta.scrollHeight + 4) + 'px'; } return; }
+  if (e.target.closest('[data-ncancel]')) { noteEdit = ''; render(); return; }
+  if (e.target.closest('[data-ntpl]')) { const ta = $('nText'); ta.value = ta.value.trim() ? ta.value.replace(/\s*$/, '\n') + FORMULA : FORMULA; ta.style.height = Math.max(150, ta.scrollHeight + 4) + 'px'; ta.focus(); ta.setSelectionRange(ta.value.indexOf(': ') + 2, ta.value.indexOf(': ') + 2); return; }
+  const ns = e.target.closest('[data-nsave]');
+  if (ns) {
+    const sale = S.sales.find(x => x.id === ns.dataset.nsave); if (!sale) return;
+    sale.notes = $('nText').value.replace(/\s+$/, '');
+    queue('setNote', { id: sale.id, notes: sale.notes }); noteEdit = ''; render(); toast('Note saved'); return;
+  }
   if (e.target.id === 'cSave') {
     const nm = $('cName').value.trim(); if (!nm) { toast('The name cannot be empty'); return; }
     c.name = nm; c.phone = $('cPhone').value.trim(); c.notes = $('cNotes').value.trim();
