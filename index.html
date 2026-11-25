@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Salon Book</title>
+<meta name="theme-color" content="#8e1b45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Salon Book">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday work tool for a small salon owner who is not a tech person: calm, obvious, big targets
+   IDEA the salon's paper appointment book: a lined day page, letter codes per service, totals at the foot
+   PICTURE the open day page itself (time, client, codes, rand) with the day's takings strip on top
+   COLOUR white page, deep berry ink and headers, rose blush band, copper for money totals
+   TYPE Outfit for titles and figures, Inter for text
+   LAYOUT laptop: book page left, add-entry card right; phone: totals strip, add card, then the page */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#171214);--ink:light-dark(#22171b,#f3e9ec);--mut:light-dark(#6d5a61,#b9a6ad);--berry:light-dark(#8e1b45,#f07aa3);--blush:light-dark(#fbe4e8,#2a1a20);--line:light-dark(#ecdde1,#3a2a30);--card:light-dark(#fff8f9,#21181b);--cu:light-dark(#9a5a1c,#e6a463);--ok:light-dark(#1f6b4a,#7fd6ad)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.fig-n{font-family:Outfit,Inter,sans-serif;letter-spacing:-.02em;line-height:1.05;margin:0}
+header{background:var(--blush);padding:18px max(4vw,16px) 0}
+.top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+h1{font-size:clamp(30px,4vw,42px);color:var(--berry)}
+.demo{font-size:13px;color:var(--mut)}
+nav{display:flex;gap:4px;overflow-x:auto;margin-top:14px}
+nav button{flex:none;border:0;background:none;font:600 15px Inter,sans-serif;color:var(--mut);padding:12px 14px;border-radius:10px 10px 0 0;cursor:pointer;min-height:44px}
+nav button[aria-selected=true]{background:var(--bg);color:var(--berry)}
+main{padding:20px max(4vw,16px) 48px;max-width:1240px;margin:0 auto}
+section[hidden]{display:none}
+button,input,select{font:inherit;font-size:16px;color:inherit}
+input,select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid color-mix(in srgb,var(--berry) 45%,transparent);outline-offset:2px}
+.btn{border:0;background:var(--berry);color:var(--bg);font-weight:600;border-radius:10px;padding:10px 16px;min-height:44px;cursor:pointer}
+.ghost{background:none;color:var(--berry);border:1px solid var(--line)}
+.dayhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dayhead h2{font-size:clamp(26px,3vw,34px)}
+.nav2{display:flex;gap:6px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5em,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:18px}
+.strip div{background:var(--card);padding:12px 14px}
+.strip small{display:block;color:var(--mut);font-size:13px}
+.fig-n{font-size:clamp(22px,2.6vw,30px);white-space:nowrap;color:var(--ink)}
+.strip .tot .fig-n{color:var(--cu)}
+.cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:start}
+.page{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:3.4em minmax(0,1fr) auto auto 36px;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .t{font-family:Outfit,sans-serif;font-weight:600;color:var(--berry);white-space:nowrap}
+.row .who b{display:block;font-weight:600}
+.row .who span{font-size:13px;color:var(--mut)}
+.codes{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.code{font:700 13px Outfit,sans-serif;background:var(--blush);color:var(--berry);border-radius:6px;padding:3px 7px;white-space:nowrap}
+.code.p{background:color-mix(in srgb,var(--cu) 16%,transparent);color:var(--cu)}
+.amt{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.pay{font-size:12px;color:var(--mut);display:block;text-align:right}
+.x{border:0;background:none;color:var(--mut);font-size:20px;cursor:pointer;width:36px;height:36px;border-radius:8px}
+.x:hover{background:var(--blush);color:var(--berry)}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h3{font-size:20px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 12px;min-height:40px;cursor:pointer;font-size:15px}
+.chip[aria-pressed=true]{background:var(--berry);border-color:var(--berry);color:var(--bg)}
+.chip b{font-family:Outfit,sans-serif}
+.price{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 10px;padding-top:12px;border-top:1px dashed var(--line)}
+.price .fig-n{color:var(--cu)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px;align-items:start}
+.bars .b{display:grid;grid-template-columns:minmax(6em,9em) minmax(0,1fr) auto;gap:10px;align-items:center;margin:7px 0}
+.bars .track{height:14px;background:var(--blush);border-radius:7px;overflow:hidden}
+.bars .fill{height:100%;background:var(--berry);border-radius:7px}
+.bars .v{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;font-size:15px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--mut);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td input{min-height:38px;padding:6px 8px;max-width:8em;text-align:right}
+.big{font-size:clamp(40px,6vw,64px);color:var(--cu)}
+.note{font-size:13px;color:var(--mut)}
+textarea{width:100%;min-height:160px;font:13px/1.4 ui-monospace,monospace;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px #0003}
+.toast button{background:none;border:0;color:var(--bg);font-weight:700;text-decoration:underline;cursor:pointer;min-height:36px}
+@media(prefers-reduced-motion:no-preference){.row.new{animation:ink .8s ease-out}@keyframes ink{from{background:var(--blush)}to{background:transparent}}}
+@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}.cols .card{order:-1}}
+@media(max-width:600px){.row{grid-template-columns:3em minmax(0,1fr) auto 32px}.row .codes{grid-column:2/4;justify-content:flex-start;order:5}.bars .b{grid-template-columns:minmax(5em,7em) minmax(0,1fr) auto}table{font-size:13px}th,td{padding:6px 4px}}
+</style>
+<style>
+header{padding-top:max(18px,env(safe-area-inset-top))}
+.sync{font-size:13px;border-radius:999px;padding:4px 10px;background:var(--bg);color:var(--mut);white-space:nowrap;border:0;cursor:pointer}
+.sync.ok{color:var(--ok)}
+.sync.wait{color:var(--cu)}
+.sync.err{color:var(--berry);font-weight:600}
+.gate{position:fixed;inset:0;background:var(--blush);display:grid;place-items:center;padding:24px;z-index:5}
+.gate .card{width:min(100%,380px);background:var(--bg)}
+.gate h1{margin-bottom:6px}
+.err{color:var(--berry);font-size:14px;min-height:1.4em;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="gate" id="gate" hidden>
+  <form class="card" id="gateForm">
+    <h1>Salon Book</h1>
+    <p class="note" id="gateNote">Type the salon PIN to open the book on this phone.</p>
+    <label for="pin">Salon PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="current-password">
+    <button class="btn" style="width:100%;margin-top:14px" id="gateBtn">Open the book</button>
+    <p class="err" id="gateErr" role="alert"></p>
+  </form>
+</div>
+<header>
+  <div class="top"><h1 id="salonName">Salon Book</h1><button class="sync" id="sync" title="Tap to sync now">Loading</button></div>
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-v="day" aria-selected="true">Day book</button>
+    <button role="tab" data-v="shop" aria-selected="false">Sell product</button>
+    <button role="tab" data-v="exp" aria-selected="false">Expenses</button>
+    <button role="tab" data-v="month" aria-selected="false">Month-end</button>
+    <button role="tab" data-v="prices" aria-selected="false">Price list</button>
+  </nav>
+</header>
+<main>
+<section id="v-day">
+  <div class="dayhead"><h2 id="dayTitle"></h2><div class="nav2"><button class="btn ghost" id="prev" aria-label="Previous day">‹</button><input type="date" id="dayPick" style="width:auto"><button class="btn ghost" id="next" aria-label="Next day">›</button><button class="btn ghost" id="today">Today</button></div></div>
+  <div class="strip" id="dayStrip"></div>
+  <div class="cols">
+    <div class="page" id="dayPage"></div>
+    <form class="card" id="addForm">
+      <h3>Write in the book</h3>
+      <div class="two"><div><label for="fTime">Time</label><input id="fTime" type="time"></div><div><label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off"></div></div>
+      <label>Stylist</label><div class="chips" id="fStylist"></div>
+      <label for="fCodes">Service codes (tap, or type e.g. CB+T)</label><input id="fCodes" autocomplete="off" style="text-transform:uppercase">
+      <div class="chips" id="codeBtns" style="margin-top:8px"></div>
+      <label>Paid by</label><div class="chips" id="fPay"></div>
+      <div class="price"><span id="fDesc" class="note">No service yet</span><span class="fig-n" id="fAmt">R0</span></div>
+      <button class="btn" style="width:100%">Add to book</button>
+    </form>
+  </div>
+</section>
+<section id="v-shop" hidden>
+  <div class="grid2">
+    <form class="card" id="shopForm"><h3>Sell a product</h3>
+      <label>Product</label><div class="chips" id="sProd"></div>
+      <div class="two"><div><label for="sQty">Quantity</label><input id="sQty" type="number" min="1" value="1"></div><div><label for="sClient">Client (optional)</label><input id="sClient"></div></div>
+      <label>Paid by</label><div class="chips" id="sPay"></div>
+      <div class="price"><span class="note" id="sDesc"></span><span class="fig-n" id="sAmt">R0</span></div>
+      <button class="btn" style="width:100%">Add sale to the day shown in the book</button>
+    </form>
+    <div class="card"><h3>Products on the shelf</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Price</th><th class="n">Sold this month</th><th class="n">Left</th></tr></thead><tbody id="stockT"></tbody></table></div><p class="note">"Left" is the StartStock in the sheet minus everything sold since.</p></div>
+  </div>
+</section>
+<section id="v-exp" hidden>
+  <div class="grid2">
+    <form class="card" id="expForm"><h3>Add an expense</h3>
+      <div class="two"><div><label for="eDate">Date</label><input id="eDate" type="date"></div><div><label for="eAmt">Amount (R)</label><input id="eAmt" type="number" min="0" step="0.01" inputmode="decimal"></div></div>
+      <label for="eDesc">What was it for</label><input id="eDesc" placeholder="e.g. foils and gloves">
+      <label>Type</label><div class="chips" id="eCat"></div>
+      <label>Paid by</label><div class="chips" id="ePay"></div>
+      <button class="btn" style="width:100%;margin-top:16px">Add expense</button>
+    </form>
+    <div class="card"><h3 id="expTitle">Expenses</h3><div class="scroll"><table><thead><tr><th>Date</th><th>What</th><th>Type</th><th class="n">Amount</th><th></th></tr></thead><tbody id="expT"></tbody></table></div></div>
+  </div>
+</section>
+<section id="v-month" hidden>
+  <div class="dayhead"><h2 id="mTitle"></h2><select id="mPick" style="width:auto" aria-label="Month"></select></div>
+  <div class="grid2">
+    <div class="card"><small class="note">Total takings this month</small><div class="fig-n big" id="mTot"></div><div class="strip" id="mStrip" style="margin:14px 0 0"></div></div>
+    <div class="card"><h3>How clients paid</h3><div class="bars" id="mPay"></div><p class="note" id="mCash"></p></div>
+    <div class="card"><h3>Takings per stylist</h3><div class="bars" id="mSty"></div></div>
+    <div class="card"><h3>Top services</h3><div class="bars" id="mSvc"></div></div>
+    <div class="card"><h3>Expenses by type</h3><div class="bars" id="mExp"></div></div>
+    <div class="card"><h3>Pack for the bookkeeper</h3><p class="note">One copy-and-paste with every sale and every expense for the month. Paste it into an email or WhatsApp, or into Excel.</p>
+      <div class="chips"><button type="button" class="btn" id="cpSum">Copy summary</button><button type="button" class="btn ghost" id="cpCsv">Copy all lines (CSV)</button></div>
+      <p class="note" id="cpMsg" role="status"></p><textarea id="cpBox" readonly hidden aria-label="Copied text"></textarea></div>
+  </div>
+  <h3 style="margin:26px 0 10px;font-size:22px">Day by day</h3>
+  <div class="scroll card" style="padding:4px 8px"><table><thead><tr><th>Day</th><th class="n">Clients</th><th class="n">Services</th><th class="n">Products</th><th class="n">Cash</th><th class="n">Card</th><th class="n">EFT</th><th class="n">Total</th></tr></thead><tbody id="mDays"></tbody></table></div>
+</section>
+<section id="v-prices" hidden>
+  <div class="grid2">
+    <div class="card"><h3>Services and codes</h3><p class="note">The letters are the shorthand written in the book. A changed price is used from the next booking on; old bookings keep the price they were sold at. New services are added in the Services tab of the sheet.</p><div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th>Group</th><th class="n">Price (R)</th></tr></thead><tbody id="svcT"></tbody></table></div></div>
+    <div class="card"><h3>Retail products</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Cost (R)</th><th class="n">Sell (R)</th></tr></thead><tbody id="prodT"></tbody></table></div>
+      <h3 style="margin-top:22px">This phone</h3><p class="note">Refresh pulls the latest from the sheet (after changes made in the sheet itself). Sign out removes the PIN from this phone.</p>
+      <div class="chips"><button type="button" class="btn ghost" id="refresh">Refresh from sheet</button><button type="button" class="btn ghost" id="signout">Sign out</button></div></div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="undo">Undo</button></div>
+<script>
+{
+// ===== Paste your Apps Script web app link (ends in /exec) between the quotes =====
+const API = 'https://script.google.com/macros/s/AKfycbxJY9VmWbuV9967vrJNN61TuBVSfxBzzyw1HDgPwqJYH7PEH34usw4v40Pwe538LpXw/exec';
+// ================================================================================
+
+const K_PIN = 'sb-pin', K_CACHE = 'sb-cache', K_OUT = 'sb-outbox';
+const ls = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const $ = id => document.getElementById(id);
+const R = n => (n < 0 ? '-R' : 'R') + Math.round(Math.abs(n)).toLocaleString('en-ZA').replace(/[, ]/g, ' ');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const localDate = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const nowTime = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const TODAY = () => localDate(new Date());
+const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return localDate(d); };
+const dname = s => new Date(s + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' });
+const dshort = s => new Date(s + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' });
+const newId = () => 'A' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+let pin = ls.get(K_PIN, '');
+let S = ls.get(K_CACHE, null);
+let outbox = ls.get(K_OUT, []);
+let day = TODAY(), view = 'day', lastNew = '';
+const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash' };
+
+/* ---------- talking to the sheet ---------- */
+async function api(action, data) {
+  if (!/^https:\/\/script\.google\.com\//.test(API)) throw new Error('setup');
+  const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action, pin, data }) });
+  if (!res.ok) throw new Error('net');
+  return res.json();
+}
+let busy = false, lastErr = '', retryT;
+function status() {
+  const el = $('sync');
+  if (!/^https:\/\/script\.google\.com\//.test(API)) { el.className = 'sync err'; el.textContent = 'API link not set'; return; }
+  if (lastErr) { el.className = 'sync err'; el.textContent = lastErr; return; }
+  if (outbox.length) { el.className = 'sync wait'; el.textContent = busy ? 'Saving ' + outbox.length + '…' : outbox.length + ' waiting to save'; return; }
+  el.className = 'sync ok'; el.textContent = busy ? 'Syncing…' : 'Saved';
+}
+function queue(action, data) { outbox.push({ action, data }); ls.set(K_OUT, outbox); ls.set(K_CACHE, S); status(); flush(); }
+async function flush() {
+  if (busy || !outbox.length) return;
+  busy = true; status();
+  try {
+    while (outbox.length) {
+      const op = outbox[0];
+      const r = await api(op.action, op.data);
+      if (!r.ok) {
+        if (r.error === 'Wrong PIN') { busy = false; signOut('The PIN was changed. Type the new PIN.'); return; }
+        lastErr = 'Not saved: ' + r.error;
+        outbox.shift(); ls.set(K_OUT, outbox);   // the sheet refused it, so do not keep retrying
+        continue;
+      }
+      outbox.shift(); ls.set(K_OUT, outbox); lastErr = '';
+    }
+  } catch (e) {
+    clearTimeout(retryT); retryT = setTimeout(flush, 15000);
+  }
+  busy = false; status();
+}
+async function load(showErrIn) {
+  if (outbox.length) await flush();
+  if (outbox.length) { status(); return false; }
+  busy = true; status();
+  try {
+    const r = await api('all');
+    busy = false;
+    if (!r.ok) { if (r.error === 'Wrong PIN') signOut('That PIN is not right.'); else if (showErrIn) $(showErrIn).textContent = r.error; status(); return false; }
+    S = r.data; ls.set(K_CACHE, S); lastErr = ''; status(); render(); return true;
+  } catch (e) {
+    busy = false; status();
+    if (showErrIn) $(showErrIn).textContent = e.message === 'setup' ? 'The API link is not set in index.html yet.' : 'Could not reach the sheet. Check the internet and try again.';
+    else { $('sync').className = 'sync wait'; $('sync').textContent = 'Offline, showing last copy'; }
+    return false;
+  }
+}
+function signOut(msg) { pin = ''; ls.del(K_PIN); ls.del(K_CACHE); S = null; $('gate').hidden = false; $('gateErr').textContent = msg || ''; }
+window.addEventListener('online', flush);
+
+/* ---------- helpers on the data ---------- */
+const svcBy = c => S.services.find(s => s.code === c);
+const prodBy = c => S.products.find(p => p.code === c);
+const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+const dayRows = d => S.sales.filter(x => x.date === d).sort((a, b) => String(a.time).localeCompare(String(b.time)));
+function totals(rows) {
+  const t = { all: 0, svc: 0, prod: 0, clients: new Set() };
+  for (const p of S.pays) t[p] = 0;
+  for (const r of rows) { t.all += r.amount; t[r.kind === 'svc' ? 'svc' : 'prod'] += r.amount; t[r.pay] = (t[r.pay] || 0) + r.amount; if (r.kind === 'svc') t.clients.add(r.time + r.client); }
+  return t;
+}
+function chips(el, list, key, label) {
+  if (!list.includes(form[key])) form[key] = list[0] || '';
+  $(el).innerHTML = list.map(v => `<button type="button" class="chip" data-k="${esc(key)}" data-v="${esc(v)}" aria-pressed="${form[key] === v}">${label ? label(v) : esc(v)}</button>`).join('');
+}
+document.addEventListener('click', e => { const c = e.target.closest('.chip[data-k]'); if (!c) return; form[c.dataset.k] = c.dataset.v; render(); });
+
+/* ---------- screens ---------- */
+function renderDay() {
+  $('dayTitle').textContent = dname(day) + (day === TODAY() ? ' (today)' : ''); $('dayPick').value = day;
+  if (!$('fTime').value) $('fTime').value = nowTime();
+  const rows = dayRows(day), t = totals(rows);
+  const cashExp = S.exp.filter(e => e.date === day && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
+  $('dayStrip').innerHTML = `<div class="tot"><small>Day total</small><span class="fig-n">${R(t.all)}</span></div><div><small>Clients</small><span class="fig-n">${t.clients.size}</span></div>` +
+    S.pays.map(p => `<div><small>${esc(p)}</small><span class="fig-n">${R(t[p] || 0)}</span></div>`).join('') +
+    (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
+  const wd = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' }).slice(0, 3).toLowerCase();
+  const closed = (S.closed || []).some(c => c.slice(0, 3).toLowerCase() === wd);
+  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><b>${esc(r.client || 'Walk-in')}</b><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
+    : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
+  chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
+  $('codeBtns').innerHTML = S.services.map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)} ${R(s.price)}"><b>${esc(s.code)}</b> ${esc(String(s.name).split(' ')[0])}</button>`).join('');
+  formPrice();
+}
+function formPrice() {
+  const cs = parseCodes($('fCodes').value), bad = cs.filter(c => !svcBy(c));
+  $('fAmt').textContent = R(cs.reduce((a, c) => a + ((svcBy(c) || {}).price || 0), 0));
+  $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name).join(' + ') : 'No service yet';
+}
+function renderShop() {
+  chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
+  const p = prodBy(form.sProd), q = Math.max(1, +$('sQty').value || 1);
+  $('sDesc').textContent = p ? `${p.name} x${q}` : 'No products in the sheet yet'; $('sAmt').textContent = R(p ? p.price * q : 0);
+  const m = TODAY().slice(0, 7);
+  $('stockT').innerHTML = S.products.map(p => {
+    const mine = S.sales.filter(x => x.kind === 'prod' && x.codes[0] === p.code);
+    const sold = mine.reduce((a, x) => a + x.qty, 0), msold = mine.filter(x => x.date.startsWith(m)).reduce((a, x) => a + x.qty, 0), left = p.start - sold;
+    return `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${R(p.price)}</td><td class="n">${msold}</td><td class="n" style="${left <= 3 ? 'color:var(--berry);font-weight:700' : ''}">${left}${left <= 3 ? ' reorder' : ''}</td></tr>`;
+  }).join('');
+}
+function renderExp() {
+  chips('eCat', S.cats, 'eCat'); chips('ePay', S.pays, 'ePay'); if (!$('eDate').value) $('eDate').value = TODAY();
+  const m = TODAY().slice(0, 7), list = S.exp.filter(e => e.date.startsWith(m)).sort((a, b) => b.date.localeCompare(a.date));
+  $('expTitle').textContent = 'Expenses this month: ' + R(list.reduce((a, e) => a + e.amount, 0));
+  $('expT').innerHTML = list.map(e => `<tr><td style="white-space:nowrap">${esc(dshort(e.date))}</td><td>${esc(e.desc)}<br><span class="note">${esc(e.pay)}</span></td><td>${esc(e.cat)}</td><td class="n">${R(e.amount)}</td><td><button class="x" data-dele="${esc(e.id)}" aria-label="Remove expense">×</button></td></tr>`).join('') || '<tr><td colspan="5" class="note">No expenses this month yet.</td></tr>';
+}
+function bars(el, pairs) { const max = Math.max(1, ...pairs.map(p => p[1])); $(el).innerHTML = pairs.map(([k, v]) => `<div class="b"><span>${esc(k)}</span><span class="track"><span class="fill" style="display:block;width:${(v / max * 100).toFixed(1)}%"></span></span><span class="v">${R(v)}</span></div>`).join('') || '<p class="note">Nothing yet.</p>'; }
+function monthData(m) { const rows = S.sales.filter(x => x.date.startsWith(m)), ex = S.exp.filter(e => e.date.startsWith(m)); return { rows, ex, t: totals(rows), exTot: ex.reduce((a, e) => a + e.amount, 0) }; }
+function renderMonth() {
+  const months = [...new Set(S.sales.map(x => x.date.slice(0, 7)).concat(S.exp.map(e => e.date.slice(0, 7)), [TODAY().slice(0, 7)]))].sort().reverse();
+  const keep = $('mPick').value;
+  $('mPick').innerHTML = months.map(m => `<option value="${esc(m)}">${esc(new Date(m + '-15T12:00:00').toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' }))}</option>`).join('');
+  $('mPick').value = months.includes(keep) ? keep : months[0];
+  const m = $('mPick').value, { rows, ex, t, exTot } = monthData(m);
+  $('mTitle').textContent = 'Month-end: ' + $('mPick').selectedOptions[0].textContent + (m === TODAY().slice(0, 7) ? ' (to date)' : '');
+  $('mTot').textContent = R(t.all);
+  const cost = rows.filter(r => r.kind === 'prod').reduce((a, r) => a + ((prodBy(r.codes[0]) || {}).cost || 0) * r.qty, 0);
+  $('mStrip').innerHTML = `<div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Products</small><span class="fig-n">${R(t.prod)}</span></div><div><small>Expenses</small><span class="fig-n">${R(exTot)}</span></div><div class="tot"><small>Left after expenses</small><span class="fig-n">${R(t.all - exTot - cost)}</span></div>`;
+  bars('mPay', S.pays.map(p => [p, t[p] || 0]));
+  const cashEx = ex.filter(e => e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
+  $('mCash').textContent = `Cash taken ${R(t.Cash || 0)}, cash expenses ${R(cashEx)}: ${R((t.Cash || 0) - cashEx)} cash should have gone to the bank. "Left after expenses" also takes off the cost of products sold (${R(cost)}).`;
+  bars('mSty', S.stylists.map(s => [s, rows.filter(r => r.stylist === s && r.kind === 'svc').reduce((a, r) => a + r.amount, 0)]));
+  const sv = {}; for (const r of rows.filter(r => r.kind === 'svc')) for (const c of r.codes) { const s = svcBy(c); if (s) sv[s.name] = (sv[s.name] || 0) + s.price; }
+  bars('mSvc', Object.entries(sv).sort((a, b) => b[1] - a[1]).slice(0, 8));
+  const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount; bars('mExp', Object.entries(ec).sort((a, b) => b[1] - a[1]));
+  const days = [...new Set(rows.map(r => r.date))].sort();
+  const cell = (x, p) => `<td class="n">${R(x[p] || 0)}</td>`;
+  $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
+    `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
+}
+function renderPrices() {
+  $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
+  $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${R(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
+}
+function render() {
+  if (!S) return;
+  $('salonName').textContent = S.salon || 'Salon Book'; document.title = S.salon || 'Salon Book';
+  ({ day: renderDay, shop: renderShop, exp: renderExp, month: renderMonth, prices: renderPrices })[view]();
+}
+
+/* ---------- actions ---------- */
+let undoFn = null, toastT;
+function toast(msg, undo) { $('toastMsg').textContent = msg; undoFn = undo; $('undo').hidden = !undo; $('toast').hidden = false; clearTimeout(toastT); toastT = setTimeout(() => $('toast').hidden = true, 5000); }
+$('undo').onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); } $('toast').hidden = true; };
+
+$('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
+$('prev').onclick = () => { day = addDays(day, -1); render(); }; $('next').onclick = () => { day = addDays(day, 1); render(); }; $('today').onclick = () => { day = TODAY(); render(); };
+$('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
+$('fCodes').oninput = formPrice;
+$('codeBtns').onclick = e => { const b = e.target.closest('[data-add]'); if (!b) return; const cur = parseCodes($('fCodes').value); cur.push(b.dataset.add); $('fCodes').value = cur.join('+'); formPrice(); };
+$('sync').onclick = () => { lastErr = ''; load(); };
+
+function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay }); }
+function removeSale(id) { const r = S.sales.find(x => x.id === id); if (!r) return; S.sales = S.sales.filter(x => x.id !== id); queue('delSale', { id }); render(); toast('Line removed', () => { S.sales.push(r); queue('undelSale', { id }); }); }
+
+$('addForm').onsubmit = e => {
+  e.preventDefault();
+  const cs = parseCodes($('fCodes').value);
+  if (!cs.length || cs.some(c => !svcBy(c))) { $('fDesc').textContent = cs.length ? 'Fix the unknown code first' : 'Add at least one service code'; return; }
+  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: $('fClient').value.trim() || 'Walk-in', stylist: form.stylist, codes: cs, qty: 1, amount: cs.reduce((a, c) => a + svcBy(c).price, 0), pay: form.pay };
+  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; render();
+  toast(`Added ${r.client}, ${R(r.amount)}`, () => removeSale(r.id));
+};
+$('dayPage').onclick = e => { const b = e.target.closest('[data-del]'); if (b) removeSale(b.dataset.del); };
+$('sQty').oninput = render;
+$('shopForm').onsubmit = e => {
+  e.preventDefault();
+  const p = prodBy(form.sProd); if (!p) return;
+  const q = Math.max(1, +$('sQty').value || 1);
+  const r = { id: newId(), kind: 'prod', date: day, time: day === TODAY() ? nowTime() : '12:00', client: $('sClient').value.trim() || 'Walk-in', stylist: '', codes: [p.code], qty: q, amount: p.price * q, pay: form.sPay };
+  addSale(r); $('sQty').value = 1; $('sClient').value = ''; render();
+  toast(`Sold ${p.name} x${q}, ${R(r.amount)}`, () => removeSale(r.id));
+};
+$('expForm').onsubmit = e => {
+  e.preventDefault();
+  const a = Math.round(parseFloat(String($('eAmt').value).replace(',', '.')) * 100) / 100;
+  if (!(a > 0) || !$('eDesc').value.trim()) { toast('Fill in what it was for and the amount'); return; }
+  const x = { id: newId(), date: $('eDate').value || TODAY(), desc: $('eDesc').value.trim(), cat: form.eCat, amount: a, pay: form.ePay };
+  S.exp.push(x); queue('addExpense', x); $('eAmt').value = ''; $('eDesc').value = ''; render();
+  toast(`Expense added, ${R(a)}`, () => { S.exp = S.exp.filter(y => y.id !== x.id); queue('delExpense', { id: x.id }); });
+};
+$('expT').onclick = e => {
+  const b = e.target.closest('[data-dele]'); if (!b) return;
+  const id = b.dataset.dele, x = S.exp.find(y => y.id === id);
+  S.exp = S.exp.filter(y => y.id !== id); queue('delExpense', { id }); render();
+  toast('Expense removed', () => { S.exp.push(x); queue('undelExpense', { id }); });
+};
+$('mPick').onchange = render;
+$('v-prices').addEventListener('change', e => {
+  const t = e.target, price = Math.max(0, +t.value || 0);
+  if (t.dataset.sp) { svcBy(t.dataset.sp).price = price; queue('setPrice', { kind: 'svc', code: t.dataset.sp, price }); toast('Price updated'); }
+  if (t.dataset.pp) { prodBy(t.dataset.pp).price = price; queue('setPrice', { kind: 'prod', code: t.dataset.pp, price }); toast('Price updated'); }
+});
+$('refresh').onclick = () => { lastErr = ''; load().then(ok => toast(ok ? 'Up to date with the sheet' : 'Could not refresh right now')); };
+$('signout').onclick = () => { if (outbox.length) { toast('Wait until everything is saved before signing out'); return; } signOut(); };
+
+function copyOut(text, label) {
+  $('cpBox').value = text;
+  const show = () => { $('cpBox').hidden = false; $('cpBox').select(); $('cpMsg').textContent = 'Copy did not work here, so the text is below: select it and copy.'; };
+  try { navigator.clipboard.writeText(text).then(() => { $('cpMsg').textContent = label + ' copied. Paste it into an email or WhatsApp.'; $('cpBox').hidden = true; }, show); } catch (e) { show(); }
+}
+$('cpSum').onclick = () => {
+  const m = $('mPick').value, { ex, t, exTot } = monthData(m), name = $('mPick').selectedOptions[0].textContent;
+  const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount;
+  copyOut([`${S.salon} takings - ${name}`, `Services: ${R(t.svc)}`, `Products: ${R(t.prod)}`, `Total takings: ${R(t.all)}`, '  ' + S.pays.map(p => `${p} ${R(t[p] || 0)}`).join(' | '), `Clients: ${t.clients.size}`, '', `Expenses: ${R(exTot)}`, ...Object.entries(ec).map(([k, v]) => `  ${k}: ${R(v)}`)].join('\n'), 'Summary');
+};
+$('cpCsv').onclick = () => {
+  const m = $('mPick').value, { rows, ex } = monthData(m), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  const lines = ['Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by',
+    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => ((svcBy(c) || prodBy(c)) || {}).name || c).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay].join(',')),
+    ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => ['Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay].join(','))];
+  copyOut(lines.join('\n'), 'All lines');
+};
+
+/* ---------- start ---------- */
+$('gateForm').onsubmit = async e => {
+  e.preventDefault();
+  pin = $('pin').value.trim(); $('gateErr').textContent = ''; $('gateBtn').disabled = true; $('gateBtn').textContent = 'Opening…';
+  const ok = await load('gateErr');
+  $('gateBtn').disabled = false; $('gateBtn').textContent = 'Open the book';
+  if (ok) { ls.set(K_PIN, pin); $('gate').hidden = true; $('pin').value = ''; }
+};
+if (pin && S) { $('gate').hidden = true; render(); status(); load(); }
+else if (pin) { $('gate').hidden = true; load().then(ok => { if (!ok && !S) { $('gate').hidden = false; } }); }
+else { $('gate').hidden = false; status(); }
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+</script>
+</body>
+</html>
