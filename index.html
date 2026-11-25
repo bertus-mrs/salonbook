@@ -98,11 +98,21 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .sync{font-size:13px;border-radius:999px;padding:4px 10px;background:var(--bg);color:var(--mut);white-space:nowrap;border:0;cursor:pointer}
 .sync.ok{color:var(--ok)}
 .sync.wait{color:var(--cu)}
-.sync.err{color:var(--berry);font-weight:600}
+.sync.grp .chip{min-height:34px;padding:5px 11px;font-size:14px}
+.grp .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.amtl{display:flex;align-items:center;gap:4px;margin:0;font:600 22px Outfit,sans-serif;color:var(--cu)}
+.amtl input{width:6.5em;font:600 22px Outfit,sans-serif;color:var(--cu);text-align:right;padding:6px 8px;min-height:44px}
+.from{font-size:12px;color:var(--mut)}
+.err{color:var(--berry);font-weight:600}
 [hidden]{display:none!important}
 .gate{position:fixed;inset:0;background:var(--blush);display:grid;place-items:center;padding:24px;z-index:5}
 .gate .card{width:min(100%,380px);background:var(--bg)}
 .gate h1{margin-bottom:6px}
+.grp .chip{min-height:34px;padding:5px 11px;font-size:14px}
+.grp .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.amtl{display:flex;align-items:center;gap:4px;margin:0;font:600 22px Outfit,sans-serif;color:var(--cu)}
+.amtl input{width:6.5em;font:600 22px Outfit,sans-serif;color:var(--cu);text-align:right;padding:6px 8px;min-height:44px}
+.from{font-size:12px;color:var(--mut)}
 .err{color:var(--berry);font-size:14px;min-height:1.4em;margin-top:8px}
 </style>
 </head>
@@ -136,10 +146,12 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
       <h3>Write in the book</h3>
       <div class="two"><div><label for="fTime">Time</label><input id="fTime" type="time"></div><div><label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off"></div></div>
       <label>Stylist</label><div class="chips" id="fStylist"></div>
-      <label for="fCodes">Service codes (tap, or type e.g. CB+T)</label><input id="fCodes" autocomplete="off" style="text-transform:uppercase">
+      <label for="fCodes">Service codes (tap, or type e.g. CM+BT)</label><input id="fCodes" autocomplete="off" style="text-transform:uppercase">
+      <div class="chips grp" id="grpBtns" style="margin-top:10px"></div>
       <div class="chips" id="codeBtns" style="margin-top:8px"></div>
       <label>Paid by</label><div class="chips" id="fPay"></div>
-      <div class="price"><span id="fDesc" class="note">No service yet</span><span class="fig-n" id="fAmt">R0</span></div>
+      <div class="price"><span id="fDesc" class="note">No service yet</span><label class="amtl" for="fAmtIn">R<input id="fAmtIn" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="Amount charged"></label></div>
+      <p class="note" id="fVary" hidden>Price varies with length and thickness: check the amount before adding.</p>
       <button class="btn" style="width:100%">Add to book</button>
     </form>
   </div>
@@ -185,7 +197,7 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 </section>
 <section id="v-prices" hidden>
   <div class="grid2">
-    <div class="card"><h3>Services and codes</h3><p class="note">The letters are the shorthand written in the book. A changed price is used from the next booking on; old bookings keep the price they were sold at. New services are added in the Services tab of the sheet.</p><div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th>Group</th><th class="n">Price (R)</th></tr></thead><tbody id="svcT"></tbody></table></div></div>
+    <div class="card"><h3>Services and codes</h3><p class="note">The letters are the shorthand written in the book. Prices marked "from" can be changed when booking. A changed price is used from the next booking on; old bookings keep the price they were sold at. New services are added in the Services tab of the sheet.</p><div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th>Group</th><th class="n">Price (R)</th></tr></thead><tbody id="svcT"></tbody></table></div></div>
     <div class="card"><h3>Retail products</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Cost (R)</th><th class="n">Sell (R)</th></tr></thead><tbody id="prodT"></tbody></table></div>
       <h3 style="margin-top:22px">This phone</h3><p class="note">Refresh pulls the latest from the sheet (after changes made in the sheet itself). Sign out removes the PIN from this phone.</p>
       <div class="chips"><button type="button" class="btn ghost" id="refresh">Refresh from sheet</button><button type="button" class="btn ghost" id="signout">Sign out</button></div></div>
@@ -221,7 +233,8 @@ let pin = ls.get(K_PIN, '');
 let S = ls.get(K_CACHE, null);
 let outbox = ls.get(K_OUT, []);
 let day = TODAY(), view = 'day', lastNew = '';
-const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash' };
+const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '' };
+let amtTouched = false;
 
 /* ---------- talking to the sheet ---------- */
 async function api(action, data) {
@@ -309,13 +322,19 @@ function renderDay() {
   $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><b>${esc(r.client || 'Walk-in')}</b><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
     : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
   chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
-  $('codeBtns').innerHTML = S.services.map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)} ${R(s.price)}"><b>${esc(s.code)}</b> ${esc(String(s.name).split(' ')[0])}</button>`).join('');
+  const groups = [...new Set(S.services.map(s => s.group || 'Other'))];
+  chips('grpBtns', groups, 'grp');
+  $('codeBtns').innerHTML = S.services.filter(s => (s.group || 'Other') === form.grp).map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)}"><b>${esc(s.code)}</b> ${esc(shortName(s))} <span class="from">${s.varies ? 'from ' : ''}${R(s.price)}</span></button>`).join('');
   formPrice();
 }
+function shortName(s) { return String(s.name).replace(/^PreWash, /, '').replace(/ \(.*?\)/g, '').replace(/ \+ cut,? (style|& style|& styling)(, style)?( & toner)?/, ' +cut').slice(0, 34); }
 function formPrice() {
   const cs = parseCodes($('fCodes').value), bad = cs.filter(c => !svcBy(c));
-  $('fAmt').textContent = R(cs.reduce((a, c) => a + ((svcBy(c) || {}).price || 0), 0));
-  $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name).join(' + ') : 'No service yet';
+  const sum = cs.reduce((a, c) => a + ((svcBy(c) || {}).price || 0), 0);
+  if (!amtTouched) $('fAmtIn').value = sum;
+  const vary = cs.some(c => (svcBy(c) || {}).varies);
+  $('fVary').hidden = !vary;
+  $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name + (svcBy(c).varies ? ' (from ' + R(svcBy(c).price) + ')' : '')).join(' + ') : 'No service yet';
 }
 function renderShop() {
   chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
@@ -350,7 +369,7 @@ function renderMonth() {
   const cashEx = ex.filter(e => e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
   $('mCash').textContent = `Cash taken ${R(t.Cash || 0)}, cash expenses ${R(cashEx)}: ${R((t.Cash || 0) - cashEx)} cash should have gone to the bank. "Left after expenses" also takes off the cost of products sold (${R(cost)}).`;
   bars('mSty', S.stylists.map(s => [s, rows.filter(r => r.stylist === s && r.kind === 'svc').reduce((a, r) => a + r.amount, 0)]));
-  const sv = {}; for (const r of rows.filter(r => r.kind === 'svc')) for (const c of r.codes) { const s = svcBy(c); if (s) sv[s.name] = (sv[s.name] || 0) + s.price; }
+  const sv = {}; for (const r of rows.filter(r => r.kind === 'svc')) { const list = r.codes.map(svcBy).filter(Boolean), base = list.reduce((a, s) => a + s.price, 0) || 1; for (const s of list) sv[s.name] = (sv[s.name] || 0) + r.amount * s.price / base; }
   bars('mSvc', Object.entries(sv).sort((a, b) => b[1] - a[1]).slice(0, 8));
   const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount; bars('mExp', Object.entries(ec).sort((a, b) => b[1] - a[1]));
   const days = [...new Set(rows.map(r => r.date))].sort();
@@ -359,7 +378,7 @@ function renderMonth() {
     `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
 }
 function renderPrices() {
-  $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
+  $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}${s.varies ? ' <span class="from">(from)</span>' : ''}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
   $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${R(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
 }
 function render() {
@@ -376,8 +395,9 @@ $('undo').onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); } $
 $('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
 $('prev').onclick = () => { day = addDays(day, -1); render(); }; $('next').onclick = () => { day = addDays(day, 1); render(); }; $('today').onclick = () => { day = TODAY(); render(); };
 $('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
-$('fCodes').oninput = formPrice;
-$('codeBtns').onclick = e => { const b = e.target.closest('[data-add]'); if (!b) return; const cur = parseCodes($('fCodes').value); cur.push(b.dataset.add); $('fCodes').value = cur.join('+'); formPrice(); };
+$('fCodes').oninput = () => { amtTouched = false; formPrice(); };
+$('fAmtIn').oninput = () => { amtTouched = true; };
+$('codeBtns').onclick = e => { const b = e.target.closest('[data-add]'); if (!b) return; const cur = parseCodes($('fCodes').value); cur.push(b.dataset.add); $('fCodes').value = cur.join('+'); amtTouched = false; formPrice(); };
 $('sync').onclick = () => { lastErr = ''; load(); };
 
 function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay }); }
@@ -387,8 +407,11 @@ $('addForm').onsubmit = e => {
   e.preventDefault();
   const cs = parseCodes($('fCodes').value);
   if (!cs.length || cs.some(c => !svcBy(c))) { $('fDesc').textContent = cs.length ? 'Fix the unknown code first' : 'Add at least one service code'; return; }
-  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: $('fClient').value.trim() || 'Walk-in', stylist: form.stylist, codes: cs, qty: 1, amount: cs.reduce((a, c) => a + svcBy(c).price, 0), pay: form.pay };
-  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; render();
+  if (!amtTouched) formPrice();
+  const amt = Math.round((+$('fAmtIn').value || 0) * 100) / 100;
+  if (amt < 0) { $('fDesc').textContent = 'The amount cannot be negative'; return; }
+  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: $('fClient').value.trim() || 'Walk-in', stylist: form.stylist, codes: cs, qty: 1, amount: amt, pay: form.pay };
+  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; amtTouched = false; render();
   toast(`Added ${r.client}, ${R(r.amount)}`, () => removeSale(r.id));
 };
 $('dayPage').onclick = e => { const b = e.target.closest('[data-del]'); if (b) removeSale(b.dataset.del); };
