@@ -103,6 +103,29 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .amtl{display:flex;align-items:center;gap:4px;margin:0;font:600 22px Outfit,sans-serif;color:var(--cu)}
 .amtl input{width:6.5em;font:600 22px Outfit,sans-serif;color:var(--cu);text-align:right;padding:6px 8px;min-height:44px}
 .from{font-size:12px;color:var(--mut)}
+.ta{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 12px;font:16px/1.4 Inter,sans-serif;resize:vertical}
+.cl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:22px;align-items:start}
+.cscroll{max-height:62vh;overflow-y:auto;margin-top:10px;border-top:1px solid var(--line)}
+.ci{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 4px;cursor:pointer;color:var(--ink);min-height:52px}
+.ci[aria-current=true]{background:var(--blush)}
+.ci b{display:block;font-weight:600}
+.ci small{color:var(--mut);font-size:13px}
+.ci .amt{font-size:14px}
+.chead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start}
+.chead h2{font-size:clamp(26px,3vw,34px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5em,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+.stats div{background:var(--card);padding:10px 12px}
+.stats small{display:block;color:var(--mut);font-size:12px}
+.stats b{font:600 18px Outfit,sans-serif}
+.visit{display:grid;grid-template-columns:5.6em minmax(0,1fr) auto;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.visit .d{font:600 15px Outfit,sans-serif;color:var(--berry);line-height:1.2}
+.visit .d small{display:block;font:400 12px Inter,sans-serif;color:var(--mut)}
+.visit .what{font-size:15px}
+.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px}
+.cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
+.linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.linkish:hover b{text-decoration:underline}
+@media(max-width:860px){.cl{grid-template-columns:minmax(0,1fr)}.cscroll{max-height:40vh}}
 .err{color:var(--berry);font-weight:600}
 [hidden]{display:none!important}
 .gate{position:fixed;inset:0;background:var(--blush);display:grid;place-items:center;padding:24px;z-index:5}
@@ -113,6 +136,29 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .amtl{display:flex;align-items:center;gap:4px;margin:0;font:600 22px Outfit,sans-serif;color:var(--cu)}
 .amtl input{width:6.5em;font:600 22px Outfit,sans-serif;color:var(--cu);text-align:right;padding:6px 8px;min-height:44px}
 .from{font-size:12px;color:var(--mut)}
+.ta{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 12px;font:16px/1.4 Inter,sans-serif;resize:vertical}
+.cl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:22px;align-items:start}
+.cscroll{max-height:62vh;overflow-y:auto;margin-top:10px;border-top:1px solid var(--line)}
+.ci{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 4px;cursor:pointer;color:var(--ink);min-height:52px}
+.ci[aria-current=true]{background:var(--blush)}
+.ci b{display:block;font-weight:600}
+.ci small{color:var(--mut);font-size:13px}
+.ci .amt{font-size:14px}
+.chead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start}
+.chead h2{font-size:clamp(26px,3vw,34px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5em,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+.stats div{background:var(--card);padding:10px 12px}
+.stats small{display:block;color:var(--mut);font-size:12px}
+.stats b{font:600 18px Outfit,sans-serif}
+.visit{display:grid;grid-template-columns:5.6em minmax(0,1fr) auto;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.visit .d{font:600 15px Outfit,sans-serif;color:var(--berry);line-height:1.2}
+.visit .d small{display:block;font:400 12px Inter,sans-serif;color:var(--mut)}
+.visit .what{font-size:15px}
+.visit .vn{margin-top:6px;font-size:14px;background:var(--blush);border-radius:8px;padding:6px 9px}
+.cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
+.linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.linkish:hover b{text-decoration:underline}
+@media(max-width:860px){.cl{grid-template-columns:minmax(0,1fr)}.cscroll{max-height:40vh}}
 .err{color:var(--berry);font-size:14px;min-height:1.4em;margin-top:8px}
 </style>
 </head>
@@ -130,6 +176,7 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
   <div class="top"><h1 id="salonName">Salon Book</h1><button class="sync" id="sync" title="Tap to sync now">Loading</button></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-v="day" aria-selected="true">Day book</button>
+    <button role="tab" data-v="clients" aria-selected="false">Clients</button>
     <button role="tab" data-v="shop" aria-selected="false">Sell product</button>
     <button role="tab" data-v="exp" aria-selected="false">Expenses</button>
     <button role="tab" data-v="month" aria-selected="false">Month-end</button>
@@ -144,7 +191,9 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
     <div class="page" id="dayPage"></div>
     <form class="card" id="addForm">
       <h3>Write in the book</h3>
-      <div class="two"><div><label for="fTime">Time</label><input id="fTime" type="time"></div><div><label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off"></div></div>
+      <div class="two"><div><label for="fTime">Time</label><input id="fTime" type="time"></div><div><label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off" list="clientList"></div></div>
+      <datalist id="clientList"></datalist>
+      <p class="note" id="fClientInfo"></p>
       <label>Stylist</label><div class="chips" id="fStylist"></div>
       <label for="fCodes">Service codes (tap, or type e.g. CM+BT)</label><input id="fCodes" autocomplete="off" style="text-transform:uppercase">
       <div class="chips grp" id="grpBtns" style="margin-top:10px"></div>
@@ -152,15 +201,22 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
       <label>Paid by</label><div class="chips" id="fPay"></div>
       <div class="price"><span id="fDesc" class="note">No service yet</span><label class="amtl" for="fAmtIn">R<input id="fAmtIn" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="Amount charged"></label></div>
       <p class="note" id="fVary" hidden>Price varies with length and thickness: check the amount before adding.</p>
+      <label for="fNotes">Notes for this visit (formula, what was done)</label><textarea id="fNotes" rows="2" class="ta" placeholder="e.g. 7.1 + 6%, 35 min"></textarea>
       <button class="btn" style="width:100%">Add to book</button>
     </form>
+  </div>
+</section>
+<section id="v-clients" hidden>
+  <div class="cl">
+    <div class="card clist"><h3>Clients</h3><input id="cSearch" type="search" placeholder="Search name or phone" autocomplete="off" aria-label="Search clients"><p class="note" id="cCount"></p><div id="cList" class="cscroll"></div></div>
+    <div id="cDetail" class="card"><p class="note">Pick a client to see their history.</p></div>
   </div>
 </section>
 <section id="v-shop" hidden>
   <div class="grid2">
     <form class="card" id="shopForm"><h3>Sell a product</h3>
       <label>Product</label><div class="chips" id="sProd"></div>
-      <div class="two"><div><label for="sQty">Quantity</label><input id="sQty" type="number" min="1" value="1"></div><div><label for="sClient">Client (optional)</label><input id="sClient"></div></div>
+      <div class="two"><div><label for="sQty">Quantity</label><input id="sQty" type="number" min="1" value="1"></div><div><label for="sClient">Client (optional)</label><input id="sClient" list="clientList" autocomplete="off"></div></div>
       <label>Paid by</label><div class="chips" id="sPay"></div>
       <div class="price"><span class="note" id="sDesc"></span><span class="fig-n" id="sAmt">R0</span></div>
       <button class="btn" style="width:100%">Add sale to the day shown in the book</button>
@@ -231,10 +287,12 @@ const newId = () => 'A' + Date.now().toString(36) + Math.random().toString(36).s
 
 let pin = ls.get(K_PIN, '');
 let S = ls.get(K_CACHE, null);
+if (S && !S.clients) S.clients = [];
 let outbox = ls.get(K_OUT, []);
 let day = TODAY(), view = 'day', lastNew = '';
 const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '' };
 let amtTouched = false;
+let clientSel = '', clientQ = '';
 
 /* ---------- talking to the sheet ---------- */
 async function api(action, data) {
@@ -293,6 +351,19 @@ window.addEventListener('online', flush);
 
 /* ---------- helpers on the data ---------- */
 const svcBy = c => S.services.find(s => s.code === c);
+const norm = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const clientById = id => (S.clients || []).find(c => c.id === id);
+const clientByName = n => (S.clients || []).find(c => norm(c.name) === norm(n));
+function resolveClient(name) {
+  const n = String(name || '').trim();
+  if (!n || norm(n) === 'walk-in') return '';
+  const c = clientByName(n); if (c) return c.id;
+  const nc = { id: 'C' + newId().slice(1), name: n, phone: '', notes: '', created: TODAY() };
+  S.clients = S.clients || []; S.clients.push(nc); queue('addClient', nc);
+  return nc.id;
+}
+function visitsOf(c) { return S.sales.filter(x => x.clientId ? x.clientId === c.id : norm(x.client) === norm(c.name)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); }
+function lastVisitText(c) { const v = visitsOf(c).find(x => x.kind === 'svc'); return v ? `${dshort(v.date)}: ${v.codes.join('+')} (${R(v.amount)})` : 'no visits yet'; }
 const prodBy = c => S.products.find(p => p.code === c);
 const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
 const dayRows = d => S.sales.filter(x => x.date === d).sort((a, b) => String(a.time).localeCompare(String(b.time)));
@@ -319,13 +390,19 @@ function renderDay() {
     (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
   const wd = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' }).slice(0, 3).toLowerCase();
   const closed = (S.closed || []).some(c => c.slice(0, 3).toLowerCase() === wd);
-  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><b>${esc(r.client || 'Walk-in')}</b><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
+  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
     : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
   chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
+  $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(c.name)}">${esc(c.phone)}</option>`).join('');
+  clientInfo();
   const groups = [...new Set(S.services.map(s => s.group || 'Other'))];
   chips('grpBtns', groups, 'grp');
   $('codeBtns').innerHTML = S.services.filter(s => (s.group || 'Other') === form.grp).map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)}"><b>${esc(s.code)}</b> ${esc(shortName(s))} <span class="from">${s.varies ? 'from ' : ''}${R(s.price)}</span></button>`).join('');
   formPrice();
+}
+function clientInfo() {
+  const n = $('fClient').value.trim(), c = n && clientByName(n);
+  $('fClientInfo').textContent = !n ? '' : c ? `Last visit ${lastVisitText(c)}${c.notes ? ' · Note: ' + c.notes : ''}` : 'New client: will be added to the client list.';
 }
 function shortName(s) { return String(s.name).replace(/^PreWash, /, '').replace(/ \(.*?\)/g, '').replace(/ \+ cut,? (style|& style|& styling)(, style)?( & toner)?/, ' +cut').slice(0, 34); }
 function formPrice() {
@@ -335,6 +412,30 @@ function formPrice() {
   const vary = cs.some(c => (svcBy(c) || {}).varies);
   $('fVary').hidden = !vary;
   $('fDesc').textContent = bad.length ? 'Unknown code: ' + bad.join(', ') : cs.length ? cs.map(c => svcBy(c).name + (svcBy(c).varies ? ' (from ' + R(svcBy(c).price) + ')' : '')).join(' + ') : 'No service yet';
+}
+function renderClients() {
+  const list = (S.clients || []).map(c => { const v = visitsOf(c); return { c, n: v.filter(x => x.kind === 'svc').length, last: v[0] ? v[0].date : '', tot: v.reduce((a, x) => a + x.amount, 0) }; });
+  const q = norm(clientQ);
+  const shown = list.filter(x => !q || norm(x.c.name).includes(q) || String(x.c.phone).replace(/\s/g, '').includes(q.replace(/\s/g, ''))).sort((a, b) => b.last.localeCompare(a.last) || a.c.name.localeCompare(b.c.name));
+  $('cCount').textContent = `${shown.length} of ${list.length} clients, most recent visit first`;
+  $('cList').innerHTML = shown.map(x => `<button type="button" class="ci" data-cid="${esc(x.c.id)}" aria-current="${x.c.id === clientSel}"><span><b>${esc(x.c.name)}</b><small>${x.n} visit${x.n === 1 ? '' : 's'}${x.last ? ' · last ' + esc(dshort(x.last)) : ''}</small></span><span class="amt">${R(x.tot)}</span></button>`).join('') || '<p class="note">No client found.</p>';
+  const c = clientById(clientSel);
+  if (!c) { $('cDetail').innerHTML = '<p class="note">Pick a client to see their history.</p>'; return; }
+  const v = visitsOf(c), svc = v.filter(x => x.kind === 'svc'), tot = v.reduce((a, x) => a + x.amount, 0);
+  const fav = {}; for (const x of svc) for (const code of x.codes) fav[code] = (fav[code] || 0) + 1;
+  const favTop = Object.entries(fav).sort((a, b) => b[1] - a[1])[0];
+  const gaps = []; for (let i = 0; i < svc.length - 1; i++) gaps.push((new Date(svc[i].date) - new Date(svc[i + 1].date)) / 864e5);
+  const every = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 0;
+  $('cDetail').innerHTML = `<div class="chead"><div><h2>${esc(c.name)}</h2><p class="note">${c.phone ? esc(c.phone) + ' · ' : ''}client since ${esc(dshort(c.created || (svc[svc.length - 1] || {}).date || TODAY()))}</p></div><button type="button" class="btn" id="bookAgain">Book again</button></div>
+    ${c.notes ? `<div class="cnote">${esc(c.notes)}</div>` : ''}
+    <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${R(tot)}</b></div><div><small>Average visit</small><b>${R(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
+    <details><summary class="note" style="cursor:pointer">Edit name, phone and notes</summary>
+      <label for="cName">Name</label><input id="cName" value="${esc(c.name)}">
+      <label for="cPhone">Phone</label><input id="cPhone" value="${esc(c.phone)}" inputmode="tel">
+      <label for="cNotes">Notes (allergies, preferences, usual formula)</label><textarea id="cNotes" class="ta" rows="3">${esc(c.notes)}</textarea>
+      <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
+    <h3 style="margin:18px 0 4px">History</h3>
+    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small>${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}</div><div class="amt">${R(x.amount)}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
 }
 function renderShop() {
   chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
@@ -384,7 +485,7 @@ function renderPrices() {
 function render() {
   if (!S) return;
   $('salonName').textContent = S.salon || 'Salon Book'; document.title = S.salon || 'Salon Book';
-  ({ day: renderDay, shop: renderShop, exp: renderExp, month: renderMonth, prices: renderPrices })[view]();
+  ({ day: renderDay, clients: renderClients, shop: renderShop, exp: renderExp, month: renderMonth, prices: renderPrices })[view]();
 }
 
 /* ---------- actions ---------- */
@@ -395,12 +496,39 @@ $('undo').onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); } $
 $('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
 $('prev').onclick = () => { day = addDays(day, -1); render(); }; $('next').onclick = () => { day = addDays(day, 1); render(); }; $('today').onclick = () => { day = TODAY(); render(); };
 $('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
+$('fClient').oninput = clientInfo;
+function openClient(id, name) {
+  let c = clientById(id) || clientByName(name);
+  if (!c) return;
+  clientSel = c.id; view = 'clients';
+  for (const x of $('tabs').children) x.setAttribute('aria-selected', x.dataset.v === 'clients');
+  for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-clients';
+  render(); window.scrollTo(0, 0);
+}
+$('cSearch').oninput = e => { clientQ = e.target.value; render(); };
+$('cList').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
+$('cDetail').onclick = e => {
+  const c = clientById(clientSel); if (!c) return;
+  if (e.target.id === 'cSave') {
+    const nm = $('cName').value.trim(); if (!nm) { toast('The name cannot be empty'); return; }
+    c.name = nm; c.phone = $('cPhone').value.trim(); c.notes = $('cNotes').value.trim();
+    queue('updateClient', { id: c.id, name: c.name, phone: c.phone, notes: c.notes }); render(); toast('Client saved');
+  }
+  if (e.target.id === 'bookAgain') {
+    const last = visitsOf(c).find(x => x.kind === 'svc');
+    day = TODAY(); view = 'day';
+    for (const x of $('tabs').children) x.setAttribute('aria-selected', x.dataset.v === 'day');
+    for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-day';
+    $('fClient').value = c.name; $('fCodes').value = last ? last.codes.join('+') : ''; $('fTime').value = nowTime(); amtTouched = false;
+    render(); const af = $('addForm'); if (af.scrollIntoView) af.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 $('fCodes').oninput = () => { amtTouched = false; formPrice(); };
 $('fAmtIn').oninput = () => { amtTouched = true; };
 $('codeBtns').onclick = e => { const b = e.target.closest('[data-add]'); if (!b) return; const cur = parseCodes($('fCodes').value); cur.push(b.dataset.add); $('fCodes').value = cur.join('+'); amtTouched = false; formPrice(); };
 $('sync').onclick = () => { lastErr = ''; load(); };
 
-function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay }); }
+function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay, notes: r.notes || '', clientId: r.clientId || '' }); }
 function removeSale(id) { const r = S.sales.find(x => x.id === id); if (!r) return; S.sales = S.sales.filter(x => x.id !== id); queue('delSale', { id }); render(); toast('Line removed', () => { S.sales.push(r); queue('undelSale', { id }); }); }
 
 $('addForm').onsubmit = e => {
@@ -410,17 +538,19 @@ $('addForm').onsubmit = e => {
   if (!amtTouched) formPrice();
   const amt = Math.round((+$('fAmtIn').value || 0) * 100) / 100;
   if (amt < 0) { $('fDesc').textContent = 'The amount cannot be negative'; return; }
-  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: $('fClient').value.trim() || 'Walk-in', stylist: form.stylist, codes: cs, qty: 1, amount: amt, pay: form.pay };
-  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; amtTouched = false; render();
+  const cname = $('fClient').value.trim() || 'Walk-in';
+  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: cname, clientId: resolveClient(cname), stylist: form.stylist, codes: cs, qty: 1, amount: amt, pay: form.pay, notes: $('fNotes').value.trim() };
+  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; $('fNotes').value = ''; amtTouched = false; render();
   toast(`Added ${r.client}, ${R(r.amount)}`, () => removeSale(r.id));
 };
-$('dayPage').onclick = e => { const b = e.target.closest('[data-del]'); if (b) removeSale(b.dataset.del); };
+$('dayPage').onclick = e => { const o = e.target.closest('[data-open]'); if (o) { openClient(o.dataset.open, o.dataset.name); return; } const b = e.target.closest('[data-del]'); if (b) removeSale(b.dataset.del); };
 $('sQty').oninput = render;
 $('shopForm').onsubmit = e => {
   e.preventDefault();
   const p = prodBy(form.sProd); if (!p) return;
   const q = Math.max(1, +$('sQty').value || 1);
-  const r = { id: newId(), kind: 'prod', date: day, time: day === TODAY() ? nowTime() : '12:00', client: $('sClient').value.trim() || 'Walk-in', stylist: '', codes: [p.code], qty: q, amount: p.price * q, pay: form.sPay };
+  const sname = $('sClient').value.trim() || 'Walk-in';
+  const r = { id: newId(), kind: 'prod', date: day, time: day === TODAY() ? nowTime() : '12:00', client: sname, clientId: resolveClient(sname), stylist: '', codes: [p.code], qty: q, amount: p.price * q, pay: form.sPay };
   addSale(r); $('sQty').value = 1; $('sClient').value = ''; render();
   toast(`Sold ${p.name} x${q}, ${R(r.amount)}`, () => removeSale(r.id));
 };
@@ -459,9 +589,9 @@ $('cpSum').onclick = () => {
 };
 $('cpCsv').onclick = () => {
   const m = $('mPick').value, { rows, ex } = monthData(m), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
-  const lines = ['Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by',
-    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => ((svcBy(c) || prodBy(c)) || {}).name || c).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay].join(',')),
-    ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => ['Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay].join(','))];
+  const lines = ['Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by,Notes',
+    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => ((svcBy(c) || prodBy(c)) || {}).name || c).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay, q(r.notes || '')].join(',')),
+    ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => ['Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay, ''].join(','))];
   copyOut(lines.join('\n'), 'All lines');
 };
 
