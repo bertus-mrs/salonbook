@@ -20,7 +20,7 @@
    COLOUR white page, deep berry ink and headers, rose blush band, copper for money totals
    TYPE Outfit for titles and figures, Inter for text
    LAYOUT laptop: book page left, add-entry card right; phone: totals strip, add card, then the page */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#171214);--ink:light-dark(#22171b,#f3e9ec);--mut:light-dark(#6d5a61,#b9a6ad);--berry:light-dark(#8e1b45,#f07aa3);--blush:light-dark(#fbe4e8,#2a1a20);--line:light-dark(#ecdde1,#3a2a30);--card:light-dark(#fff8f9,#21181b);--cu:light-dark(#9a5a1c,#e6a463);--ok:light-dark(#1f6b4a,#7fd6ad)}
+:root{--ic:light-dark(#0b6b70,#5fd0d6);color-scheme:light dark;--bg:light-dark(#ffffff,#171214);--ink:light-dark(#22171b,#f3e9ec);--mut:light-dark(#6d5a61,#b9a6ad);--berry:light-dark(#8e1b45,#f07aa3);--blush:light-dark(#fbe4e8,#2a1a20);--line:light-dark(#ecdde1,#3a2a30);--card:light-dark(#fff8f9,#21181b);--cu:light-dark(#9a5a1c,#e6a463);--ok:light-dark(#1f6b4a,#7fd6ad)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0}
@@ -57,6 +57,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
 .row .who span{font-size:13px;color:var(--mut)}
 .codes{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .code{font:700 13px Outfit,sans-serif;background:var(--blush);color:var(--berry);border-radius:6px;padding:3px 7px;white-space:nowrap}
+.code.i{background:color-mix(in srgb,var(--ic) 15%,transparent);color:var(--ic)}
 .code.p{background:color-mix(in srgb,var(--cu) 16%,transparent);color:var(--cu)}
 .amt{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
 .pay{font-size:12px;color:var(--mut);display:block;text-align:right}
@@ -153,6 +154,22 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .cover .btn{font-size:17px;padding:12px 26px;margin:14px 0 6px}
 .lock{width:44px;height:44px;color:var(--berry);margin-bottom:6px}
 nav button.money{margin-left:auto}
+.icard{border-color:color-mix(in srgb,var(--ic) 45%,var(--line));background:color-mix(in srgb,var(--ic) 5%,var(--card))}
+.icard h3{display:flex;gap:8px;align-items:center}
+.ibtn{background:var(--ic)}
+.ilist{margin-top:8px;max-height:300px;overflow-y:auto;border-top:1px solid var(--line)}
+.ii{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:9px 4px;cursor:pointer;color:var(--ink);font-size:15px;min-height:46px}
+.ii small{display:block;color:var(--mut);font-size:12px}
+.ii b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ii[aria-pressed=true]{background:color-mix(in srgb,var(--ic) 14%,transparent)}
+.split td.n,.split th.n{width:30%}
+.split tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+.split th small{display:block;font-weight:400}
+.move{margin-top:14px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--ic) 10%,transparent);border:1px solid color-mix(in srgb,var(--ic) 35%,transparent)}
+.move h4{margin:0 0 6px;font:600 16px Outfit,sans-serif;color:var(--ic)}
+.move p{margin:4px 0;font-size:15px}
+.acc{font-size:12px;font-weight:600;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.acc.Salon{background:var(--blush);color:var(--berry)}.acc.Icon{background:color-mix(in srgb,var(--ic) 15%,transparent);color:var(--ic)}
 .gate{position:fixed;inset:0;background:var(--blush);display:grid;place-items:center;padding:24px;z-index:5}
 .gate .card{width:min(100%,380px);background:var(--bg)}
 .gate h1{margin-bottom:6px}
@@ -244,14 +261,24 @@ nav button.money{margin-left:auto}
 </section>
 <section id="v-shop" hidden>
   <div class="grid2">
-    <form class="card" id="shopForm"><h3>Sell a product</h3>
+    <form class="card" id="shopForm"><h3>Sell a salon product</h3><p class="note" id="sBank"></p>
       <label>Product</label><div class="chips" id="sProd"></div>
       <div class="two"><div><label for="sQty">Quantity</label><input id="sQty" type="number" min="1" value="1"></div><div><label for="sClient">Client (optional)</label><input id="sClient" list="clientList" autocomplete="off"></div></div>
       <label>Paid by</label><div class="chips" id="sPay"></div>
       <div class="price"><span class="note" id="sDesc"></span><span class="fig-n" id="sAmt">R0</span></div>
       <button class="btn" style="width:100%">Add sale to the day shown in the book</button>
     </form>
-    <div class="card"><h3>Products on the shelf</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Price</th><th class="n">Sold this month</th><th class="n">Left</th></tr></thead><tbody id="stockT"></tbody></table></div><p class="note">"Left" is the StartStock in the sheet minus everything sold since.</p></div>
+    <form class="card icard" id="iconForm"><h3><span class="code i">Icon</span> Sell an Icon product</h3>
+      <p class="note" id="iBank"></p>
+      <input id="iSearch" type="search" placeholder="Search name or code, e.g. silver or IR03" autocomplete="off" aria-label="Search Icon products">
+      <div class="chips grp" id="iBrands" style="margin-top:8px"></div>
+      <div id="iList" class="ilist"></div>
+      <div class="two"><div><label for="iQty">Quantity</label><input id="iQty" type="number" min="1" value="1"></div><div><label for="iClient">Client (optional)</label><input id="iClient" list="clientList" autocomplete="off"></div></div>
+      <label>Paid by</label><div class="chips" id="iPay"></div>
+      <div class="price"><span class="note" id="iDesc">Pick a product above</span><label class="amtl" for="iAmt" style="color:var(--ic)">R<input id="iAmt" type="number" min="0" step="1" inputmode="numeric" value="0" aria-label="Amount charged for the Icon product" style="color:var(--ic)"></label></div>
+      <button class="btn ibtn" style="width:100%">Add Icon sale</button>
+    </form>
+    <div class="card"><h3>Salon products on the shelf</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Price</th><th class="n">Sold this month</th><th class="n">Left</th></tr></thead><tbody id="stockT"></tbody></table></div><p class="note">"Left" is the StartStock in the sheet minus everything sold since. Icon products are not stock-counted.</p></div>
   </div>
 </section>
 <section id="v-money" hidden>
@@ -272,28 +299,30 @@ nav button.money{margin-left:auto}
   <div id="p-mday">
     <div class="dayhead"><h2 id="mdTitle"></h2><div class="nav2"><button class="btn ghost" id="mdPrev" aria-label="Previous day">&lsaquo;</button><input type="date" id="mdPick" style="width:auto"><button class="btn ghost" id="mdNext" aria-label="Next day">&rsaquo;</button><button class="btn ghost" id="mdToday">Today</button></div></div>
     <div class="strip" id="mdStrip"></div>
-    <div class="grid2"><div class="card"><h3>Takings per stylist</h3><div class="bars" id="mdSty"></div></div><div class="card"><h3>How clients paid</h3><div class="bars" id="mdPay"></div></div></div>
+    <div class="grid2"><div class="card"><h3>Salon and Icon, kept apart</h3><div class="scroll"><table class="split" id="mdSplit"></table></div></div><div class="card"><h3>Takings per stylist</h3><div class="bars" id="mdSty"></div></div><div class="card"><h3>How clients paid</h3><div class="bars" id="mdPay"></div></div></div>
   </div>
   <div id="p-month" hidden>
   <div class="dayhead"><h2 id="mTitle"></h2><select id="mPick" style="width:auto" aria-label="Month"></select></div>
   <div class="grid2">
+    <div class="card icard" style="grid-column:1/-1"><h3>Salon and Icon, kept apart</h3><div class="scroll"><table class="split" id="mSplit"></table></div><div class="move" id="mMove"></div></div>
     <div class="card"><small class="note">Total takings this month</small><div class="fig-n big" id="mTot"></div><div class="strip" id="mStrip" style="margin:14px 0 0"></div></div>
     <div class="card"><h3>How clients paid</h3><div class="bars" id="mPay"></div><p class="note" id="mCash"></p></div>
     <div class="card"><h3>Takings per stylist</h3><div class="bars" id="mSty"></div></div>
     <div class="card"><h3>Top services</h3><div class="bars" id="mSvc"></div></div>
     <div class="card"><h3>Expenses by type</h3><div class="bars" id="mExp"></div></div>
-    <div class="card"><h3>Pack for the bookkeeper</h3><p class="note">One copy-and-paste with every sale and every expense for the month. Paste it into an email or WhatsApp, or into Excel.</p>
-      <div class="chips"><button type="button" class="btn" id="cpSum">Copy summary</button><button type="button" class="btn ghost" id="cpCsv">Copy all lines (CSV)</button></div>
+    <div class="card"><h3>Pack for the bookkeeper</h3><p class="note">One copy-and-paste with every sale and every expense for the month, split into salon and Icon. Paste it into an email or WhatsApp, or into Excel. The CSV has an Account column so the bookkeeper can filter.</p>
+      <div class="chips"><button type="button" class="btn" id="cpSum">Copy summary (salon + Icon)</button><button type="button" class="btn ibtn" id="cpIcon">Copy Icon only</button><button type="button" class="btn ghost" id="cpCsv">Copy all lines (CSV)</button></div>
       <p class="note" id="cpMsg" role="status"></p><textarea id="cpBox" readonly hidden aria-label="Copied text"></textarea></div>
   </div>
   <h3 style="margin:26px 0 10px;font-size:22px">Day by day</h3>
-  <div class="scroll card" style="padding:4px 8px"><table><thead><tr><th>Day</th><th class="n">Clients</th><th class="n">Services</th><th class="n">Products</th><th class="n">Cash</th><th class="n">Card</th><th class="n">EFT</th><th class="n">Total</th></tr></thead><tbody id="mDays"></tbody></table></div>
+  <div class="scroll card" style="padding:4px 8px"><table><thead><tr><th>Day</th><th class="n">Clients</th><th class="n">Services</th><th class="n">Salon products</th><th class="n">Icon</th><th class="n">Cash</th><th class="n">Card</th><th class="n">EFT</th><th class="n">Total</th></tr></thead><tbody id="mDays"></tbody></table></div>
 </div>
 <div id="p-exp" hidden>
   <div class="grid2">
     <form class="card" id="expForm"><h3>Add an expense</h3>
       <div class="two"><div><label for="eDate">Date</label><input id="eDate" type="date"></div><div><label for="eAmt">Amount (R)</label><input id="eAmt" type="number" min="0" step="0.01" inputmode="decimal"></div></div>
       <label for="eDesc">What was it for</label><input id="eDesc" placeholder="e.g. foils and gloves">
+      <label>Whose money paid it</label><div class="chips" id="eAcc"></div>
       <label>Type</label><div class="chips" id="eCat"></div>
       <label>Paid by</label><div class="chips" id="ePay"></div>
       <button class="btn" style="width:100%;margin-top:16px">Add expense</button>
@@ -307,6 +336,9 @@ nav button.money{margin-left:auto}
   <div class="grid2">
     <div class="card"><h3>Services and codes</h3><p class="note">The letters are the shorthand written in the book. Prices marked "from" can be changed when booking. A changed price is used from the next booking on; old bookings keep the price they were sold at. New services are added in the Services tab of the sheet.</p><div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th>Group</th><th class="n">Price (R)</th></tr></thead><tbody id="svcT"></tbody></table></div></div>
     <div class="card"><h3>Retail products</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Cost (R)</th><th class="n">Sell (R)</th></tr></thead><tbody id="prodT"></tbody></table></div>
+      <h3 style="margin-top:22px"><span class="code i">Icon</span> Icon price list</h3><p class="note">From Icon's 2026 price list. Trade is what she pays Icon; Retail is the selling price (change it here if she sells for less). To hide products she never sells, put N in the Active column of the Icon tab in the sheet.</p>
+      <input id="plSearch" type="search" placeholder="Search Icon products" autocomplete="off" aria-label="Search the Icon price list">
+      <div class="scroll" style="max-height:360px;overflow-y:auto"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Trade (R)</th><th class="n">Retail (R)</th></tr></thead><tbody id="iconT"></tbody></table></div>
       <h3 style="margin-top:22px">This phone</h3><p class="note">Refresh pulls the latest from the sheet (after changes made in the sheet itself). Sign out removes the PIN from this phone.</p>
       <div class="chips"><button type="button" class="btn ghost" id="refresh">Refresh from sheet</button><button type="button" class="btn ghost" id="signout">Sign out</button></div></div>
   </div>
@@ -342,7 +374,8 @@ let S = ls.get(K_CACHE, null);
 if (S && !S.clients) S.clients = [];
 let outbox = ls.get(K_OUT, []);
 let day = TODAY(), view = 'day', lastNew = '';
-const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '' };
+const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '', iBrand: 'All', iPay: '', eAcc: 'Salon' };
+let iconSel = '', iconQ = '', iAmtTouched = false, plQ = '';
 let amtTouched = false;
 /* privacy: every rand figure except the price being charged now and the public price list is masked until she taps Show */
 let showMoney = false, moneyT, mview = 'mday';
@@ -437,12 +470,26 @@ function resolveClient(name) {
 function visitsOf(c) { return S.sales.filter(x => x.clientId ? x.clientId === c.id : (norm(x.client) === norm(fullName(c)) || (!c.surname && norm(x.client) === norm(c.name)))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); }
 function lastVisitText(c) { const v = visitsOf(c).find(x => x.kind === 'svc'); return v ? `${dshort(v.date)}: ${v.codes.join('+')} (${M(v.amount)})` : 'no visits yet'; }
 const prodBy = c => S.products.find(p => p.code === c);
+/* Salon vs Icon: every sale has a line, every expense an account */
+const BANK = k => (S.banks && S.banks[k]) || (k === 'Icon' ? 'Capitec' : 'ABSA');
+const iconBy = c => (S.icon || []).find(p => p.code === c);
+const lineOf = r => r.line === 'Icon' ? 'Icon' : 'Salon';
+const accOf = e => e.account === 'Icon' ? 'Icon' : 'Salon';
+const itemOf = (r, c) => r.kind === 'svc' ? svcBy(c) : lineOf(r) === 'Icon' ? iconBy(c) : prodBy(c);
+const nameOf = (r, c) => (itemOf(r, c) || {}).name || c;
+const codeCls = r => r.kind === 'svc' ? '' : lineOf(r) === 'Icon' ? ' i' : ' p';
 const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
 const dayRows = d => S.sales.filter(x => x.date === d).sort((a, b) => String(a.time).localeCompare(String(b.time)));
 function totals(rows) {
-  const t = { all: 0, svc: 0, prod: 0, clients: new Set() };
-  for (const p of S.pays) t[p] = 0;
-  for (const r of rows) { t.all += r.amount; t[r.kind === 'svc' ? 'svc' : 'prod'] += r.amount; t[r.pay] = (t[r.pay] || 0) + r.amount; if (r.kind === 'svc') t.clients.add(r.time + r.client); }
+  const t = { all: 0, svc: 0, prod: 0, icon: 0, clients: new Set(), L: { Salon: { all: 0, cost: 0 }, Icon: { all: 0, cost: 0 } } };
+  for (const p of S.pays) { t[p] = 0; t.L.Salon[p] = 0; t.L.Icon[p] = 0; }
+  for (const r of rows) {
+    const l = lineOf(r), L = t.L[l];
+    t.all += r.amount; t[r.kind === 'svc' ? 'svc' : l === 'Icon' ? 'icon' : 'prod'] += r.amount; t[r.pay] = (t[r.pay] || 0) + r.amount;
+    L.all += r.amount; L[r.pay] = (L[r.pay] || 0) + r.amount;
+    if (r.kind === 'prod') L.cost += ((itemOf(r, r.codes[0]) || {}).cost || 0) * (r.qty || 1);
+    if (r.kind === 'svc') t.clients.add(r.time + r.client);
+  }
   return t;
 }
 function chips(el, list, key, label) {
@@ -462,7 +509,7 @@ function renderDay() {
   $('dayStrip').innerHTML = `<div><small>Clients</small><span class="fig-n">${t.clients.size}</span></div><div><small>Services done</small><span class="fig-n">${nSvc}</span></div><div><small>Products sold</small><span class="fig-n">${nProd}</span></div><div><small>First / last</small><span class="fig-n">${tm.length ? esc(tm[0]) + (tm.length > 1 ? ' \u2013 ' + esc(tm[tm.length - 1]) : '') : '-'}</span></div>`;
   const wd = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' }).slice(0, 3).toLowerCase();
   const closed = (S.closed || []).some(c => c.slice(0, 3).toLowerCase() === wd);
-  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${M(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
+  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : (lineOf(r) === 'Icon' ? 'Icon: ' : '') + esc(nameOf(r, r.codes[0])) + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${codeCls(r)}" title="${esc(nameOf(r, c))}">${esc(c)}</span>`).join('')}</span><span class="amt">${M(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
     : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
   chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
   $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(fullName(c))}">${esc(c.phone)}</option>`).join('');
@@ -540,10 +587,32 @@ function renderClients() {
       ${clientForm(c)}
       <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
     <h3 style="margin:18px 0 4px">History</h3>
-    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${M(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
+    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${codeCls(x)}">${esc(code)}</span>`).join('')}</span><div>${lineOf(x) === 'Icon' ? 'Icon: ' : ''}${esc(x.codes.map(code => nameOf(x, code)).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${M(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
   if (draft && $('nText')) { $('nText').value = draft[0]; if (draft[1]) $('nText').focus(); }
 }
+function iconList() {
+  const q = norm(iconQ), words = q.split(' ').filter(Boolean), br = form.iBrand;
+  let list;
+  if (!words.length) {
+    const cnt = {}; for (const r of S.sales) if (lineOf(r) === 'Icon') cnt[r.codes[0]] = (cnt[r.codes[0]] || 0) + (r.qty || 1);
+    list = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(iconBy).filter(p => p && (br === 'All' || p.brand === br)).slice(0, 10);
+    if (!list.length) list = (S.icon || []).filter(p => br !== 'All' && p.brand === br).slice(0, 40);
+  } else {
+    list = (S.icon || []).filter(p => (br === 'All' || p.brand === br) && words.every(w => norm(p.name + ' ' + p.code + ' ' + p.range).includes(w))).slice(0, 40);
+  }
+  const head = !words.length ? (list.length && br === 'All' ? '<p class="note" style="margin:6px 0">Sold most:</p>' : br === 'All' ? '<p class="note" style="margin:8px 0">Type to search Icon\'s full list of ' + (S.icon || []).length + ' products, or tap a brand.</p>' : '') : list.length ? '' : '<p class="note" style="margin:8px 0">No Icon product matches that.</p>';
+  $('iList').innerHTML = head + list.map(p => `<button type="button" class="ii" data-ic="${esc(p.code)}" aria-pressed="${p.code === iconSel}"><span class="code i">${esc(p.code)}</span><span>${esc(p.name)}<small>${esc(p.brand)}${p.range ? ' · ' + esc(p.range) : ''}</small></span><b>${R(p.price)}</b></button>`).join('');
+}
+function iconPrice() {
+  const p = iconBy(iconSel), q = Math.max(1, +$('iQty').value || 1);
+  if (!iAmtTouched) $('iAmt').value = p ? p.price * q : 0;
+  $('iDesc').textContent = p ? `${p.name} x${q}` : 'Pick a product above';
+}
 function renderShop() {
+  $('sBank').textContent = `Salon money: goes to ${BANK('Salon')}.`;
+  $('iBank').textContent = `Icon money: kept apart, goes to ${BANK('Icon')}.`;
+  chips('iBrands', ['All', ...new Set((S.icon || []).map(p => p.brand))], 'iBrand'); chips('iPay', S.pays, 'iPay');
+  iconList(); iconPrice();
   chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
   const p = prodBy(form.sProd), q = Math.max(1, +$('sQty').value || 1);
   $('sDesc').textContent = p ? `${p.name} x${q}` : 'No products in the sheet yet'; $('sAmt').textContent = R(p ? p.price * q : 0);
@@ -555,10 +624,11 @@ function renderShop() {
   }).join('');
 }
 function renderExp() {
-  chips('eCat', S.cats, 'eCat'); chips('ePay', S.pays, 'ePay'); if (!$('eDate').value) $('eDate').value = TODAY();
+  chips('eAcc', ['Salon', 'Icon'], 'eAcc', v => `${esc(v)} <small>(${esc(BANK(v))})</small>`); chips('eCat', S.cats, 'eCat'); chips('ePay', S.pays, 'ePay'); if (!$('eDate').value) $('eDate').value = TODAY();
   const m = TODAY().slice(0, 7), list = S.exp.filter(e => e.date.startsWith(m)).sort((a, b) => b.date.localeCompare(a.date));
-  $('expTitle').textContent = 'Expenses this month: ' + R(list.reduce((a, e) => a + e.amount, 0));
-  $('expT').innerHTML = list.map(e => `<tr><td style="white-space:nowrap">${esc(dshort(e.date))}</td><td>${esc(e.desc)}<br><span class="note">${esc(e.pay)}</span></td><td>${esc(e.cat)}</td><td class="n">${R(e.amount)}</td><td><button class="x" data-dele="${esc(e.id)}" aria-label="Remove expense">×</button></td></tr>`).join('') || '<tr><td colspan="5" class="note">No expenses this month yet.</td></tr>';
+  const sum = k => list.filter(e => !k || accOf(e) === k).reduce((a, e) => a + e.amount, 0);
+  $('expTitle').textContent = `Expenses this month: ${R(sum())} (salon ${R(sum('Salon'))}, Icon ${R(sum('Icon'))})`;
+  $('expT').innerHTML = list.map(e => `<tr><td style="white-space:nowrap">${esc(dshort(e.date))}</td><td>${esc(e.desc)}<br><span class="note">${esc(e.pay)}</span></td><td>${esc(e.cat)} <span class="acc ${accOf(e)}">${accOf(e)}</span></td><td class="n">${R(e.amount)}</td><td><button class="x" data-dele="${esc(e.id)}" aria-label="Remove expense">×</button></td></tr>`).join('') || '<tr><td colspan="5" class="note">No expenses this month yet.</td></tr>';
 }
 function bars(el, pairs) { const max = Math.max(1, ...pairs.map(p => p[1])); $(el).innerHTML = pairs.map(([k, v]) => `<div class="b"><span>${esc(k)}</span><span class="track"><span class="fill" style="display:block;width:${(v / max * 100).toFixed(1)}%"></span></span><span class="v">${R(v)}</span></div>`).join('') || '<p class="note">Nothing yet.</p>'; }
 function monthData(m) { const rows = S.sales.filter(x => x.date.startsWith(m)), ex = S.exp.filter(e => e.date.startsWith(m)); return { rows, ex, t: totals(rows), exTot: ex.reduce((a, e) => a + e.amount, 0) }; }
@@ -570,19 +640,22 @@ function renderMonth() {
   const m = $('mPick').value, { rows, ex, t, exTot } = monthData(m);
   $('mTitle').textContent = 'Month-end: ' + $('mPick').selectedOptions[0].textContent + (m === TODAY().slice(0, 7) ? ' (to date)' : '');
   $('mTot').textContent = R(t.all);
-  const cost = rows.filter(r => r.kind === 'prod').reduce((a, r) => a + ((prodBy(r.codes[0]) || {}).cost || 0) * r.qty, 0);
-  $('mStrip').innerHTML = `<div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Products</small><span class="fig-n">${R(t.prod)}</span></div><div><small>Expenses</small><span class="fig-n">${R(exTot)}</span></div><div class="tot"><small>Left after expenses</small><span class="fig-n">${R(t.all - exTot - cost)}</span></div>`;
+  const cost = t.L.Salon.cost + t.L.Icon.cost;
+  $('mSplit').innerHTML = splitTable(t, ex);
+  const ic = t.L.Icon, icBank = (ic.Card || 0) + (ic.EFT || 0), icCashEx = ex.filter(e => accOf(e) === 'Icon' && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
+  $('mMove').innerHTML = `<h4>Move the Icon money to ${esc(BANK('Icon'))}</h4>` + (ic.all ? `<p><b>${R(icBank)}</b> Icon sales paid by card or EFT landed in ${esc(BANK('Salon'))}: transfer this from ${esc(BANK('Salon'))} to ${esc(BANK('Icon'))}.</p><p><b>${R((ic.Cash || 0) - icCashEx)}</b> Icon cash${icCashEx ? ' (after Icon cash expenses)' : ''}: deposit this into ${esc(BANK('Icon'))}, not with the salon cash.</p>` : `<p>No Icon sales this month yet.</p>`);
+  $('mStrip').innerHTML = `<div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Salon products</small><span class="fig-n">${R(t.prod)}</span></div><div><small>Icon</small><span class="fig-n" style="color:var(--ic)">${R(t.icon)}</span></div><div><small>Expenses</small><span class="fig-n">${R(exTot)}</span></div><div class="tot"><small>Left after expenses</small><span class="fig-n">${R(t.all - exTot)}</span></div>`;
   bars('mPay', S.pays.map(p => [p, t[p] || 0]));
-  const cashEx = ex.filter(e => e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
-  $('mCash').textContent = `Cash taken ${R(t.Cash || 0)}, cash expenses ${R(cashEx)}: ${R((t.Cash || 0) - cashEx)} cash should have gone to the bank. "Left after expenses" also takes off the cost of products sold (${R(cost)}).`;
+  const cashEx = ex.filter(e => e.pay === 'Cash' && accOf(e) === 'Salon').reduce((a, e) => a + e.amount, 0), sc = t.L.Salon.Cash || 0;
+  $('mCash').textContent = `Salon cash taken ${R(sc)}, salon cash expenses ${R(cashEx)}: ${R(sc - cashEx)} salon cash should have gone to ${BANK('Salon')}. Icon cash is shown separately above. "Left after expenses" is takings minus expenses paid; stock orders count when they are entered as expenses.`;
   bars('mSty', S.stylists.map(s => [s, rows.filter(r => r.stylist === s && r.kind === 'svc').reduce((a, r) => a + r.amount, 0)]));
   const sv = {}; for (const r of rows.filter(r => r.kind === 'svc')) { const list = r.codes.map(svcBy).filter(Boolean), base = list.reduce((a, s) => a + s.price, 0) || 1; for (const s of list) sv[s.name] = (sv[s.name] || 0) + r.amount * s.price / base; }
   bars('mSvc', Object.entries(sv).sort((a, b) => b[1] - a[1]).slice(0, 8));
   const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount; bars('mExp', Object.entries(ec).sort((a, b) => b[1] - a[1]));
   const days = [...new Set(rows.map(r => r.date))].sort();
   const cell = (x, p) => `<td class="n">${R(x[p] || 0)}</td>`;
-  $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
-    `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
+  $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td><td class="n">${R(x.icon)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
+    `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td><td class="n"><b>${R(t.icon)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
 }
 function renderMoneyDay() {
   $('mdTitle').textContent = dname(day) + (day === TODAY() ? ' (today)' : ''); $('mdPick').value = day;
@@ -591,7 +664,20 @@ function renderMoneyDay() {
   $('mdStrip').innerHTML = `<div class="tot"><small>Day total</small><span class="fig-n">${R(t.all)}</span></div><div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Products</small><span class="fig-n">${R(t.prod)}</span></div>` +
     (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
   bars('mdPay', S.pays.map(p => [p, t[p] || 0]));
+  const dex = S.exp.filter(e => e.date === day);
+  $('mdSplit').innerHTML = splitTable(t, dex);
   bars('mdSty', S.stylists.map(st => [st, rows.filter(r => r.stylist === st && r.kind === 'svc').reduce((a, r) => a + r.amount, 0)]));
+}
+/* one table, two columns: salon money (ABSA) and Icon money (Capitec) */
+function splitTable(t, ex) {
+  const exp = k => ex.filter(e => accOf(e) === k).reduce((a, e) => a + e.amount, 0);
+  const row = (label, f, cls) => `<tr${cls ? ' class="' + cls + '"' : ''}><td>${label}</td><td class="n">${R(f('Salon'))}</td><td class="n">${R(f('Icon'))}</td></tr>`;
+  return `<thead><tr><th></th><th class="n">Salon<small>${esc(BANK('Salon'))}</small></th><th class="n" style="color:var(--ic)">Icon<small>${esc(BANK('Icon'))}</small></th></tr></thead><tbody>` +
+    S.pays.map(p => row(esc(p), k => t.L[k][p] || 0)).join('') +
+    row('Takings', k => t.L[k].all, 'tot') +
+    row('Expenses paid', k => -exp(k)) +
+    row('Left after expenses', k => t.L[k].all - exp(k), 'tot') + '</tbody>' +
+    (t.L.Icon.all ? `<tfoot><tr><td colspan="3" class="note">Icon markup on what was sold: ${R(t.L.Icon.all - t.L.Icon.cost)} (selling price ${R(t.L.Icon.all)} minus Icon trade price ${R(t.L.Icon.cost)}).</td></tr></tfoot>` : '');
 }
 function renderMoney() {
   $('mCover').hidden = showMoney; $('mBody').hidden = !showMoney;
@@ -601,6 +687,8 @@ function renderMoney() {
   ({ mday: renderMoneyDay, month: renderMonth, exp: renderExp })[mview]();
 }
 function renderPrices() {
+  const pq = norm(plQ).split(' ').filter(Boolean);
+  $('iconT').innerHTML = (S.icon || []).filter(p => pq.every(w => norm(p.name + ' ' + p.code + ' ' + p.brand + ' ' + p.range).includes(w))).map(p => `<tr><td><span class="code i">${esc(p.code)}</span></td><td>${esc(p.name)}<br><span class="note">${esc(p.brand)} · ${esc(p.range)}</span></td><td class="n">${M(p.cost)}</td><td class="n"><input type="number" min="0" data-ip="${esc(p.code)}" value="${esc(p.price)}" aria-label="Retail price for ${esc(p.name)}"></td></tr>`).join('') || '<tr><td colspan="4" class="note">No Icon product matches.</td></tr>';
   $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}${s.varies ? ' <span class="from">(from)</span>' : ''}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
   $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${M(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
 }
@@ -679,7 +767,7 @@ $('mdPick').onchange = e => { if (e.target.value) { day = e.target.value; render
 document.addEventListener('visibilitychange', () => { if (document.hidden && showMoney) setMoney(false); });
 document.addEventListener('pointerdown', () => { if (showMoney) { clearTimeout(moneyT); moneyT = setTimeout(() => setMoney(false), 180000); } }, true);
 
-function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay, notes: r.notes || '', clientId: r.clientId || '' }); }
+function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay, notes: r.notes || '', clientId: r.clientId || '', line: lineOf(r) }); }
 function removeSale(id) { const r = S.sales.find(x => x.id === id); if (!r) return; S.sales = S.sales.filter(x => x.id !== id); queue('delSale', { id }); render(); toast('Line removed', () => { S.sales.push(r); queue('undelSale', { id }); }); }
 
 $('addForm').onsubmit = e => {
@@ -705,13 +793,28 @@ $('shopForm').onsubmit = e => {
   addSale(r); $('sQty').value = 1; $('sClient').value = ''; render();
   toast(`Sold ${p.name} x${q}, ${R(r.amount)}`, () => removeSale(r.id));
 };
+$('iSearch').oninput = e => { iconQ = e.target.value; iconList(); };
+$('iList').onclick = e => { const b = e.target.closest('[data-ic]'); if (!b) return; iconSel = b.dataset.ic; iAmtTouched = false; iconList(); iconPrice(); };
+$('iQty').oninput = () => { iAmtTouched = false; iconPrice(); };
+$('iAmt').oninput = () => { iAmtTouched = true; };
+$('iconForm').onsubmit = e => {
+  e.preventDefault();
+  const p = iconBy(iconSel); if (!p) { $('iDesc').textContent = 'Pick a product above first'; return; }
+  const q = Math.max(1, +$('iQty').value || 1), amt = Math.round((+$('iAmt').value || 0) * 100) / 100;
+  if (amt < 0) { $('iDesc').textContent = 'The amount cannot be negative'; return; }
+  const name = $('iClient').value.trim() || 'Walk-in';
+  const r = { id: newId(), kind: 'prod', line: 'Icon', date: day, time: day === TODAY() ? nowTime() : '12:00', client: name, clientId: resolveClient(name), stylist: '', codes: [p.code], qty: q, amount: amt, pay: form.iPay, notes: '' };
+  addSale(r); iconSel = ''; iAmtTouched = false; $('iQty').value = 1; $('iClient').value = ''; render();
+  toast(`Icon sale: ${p.name} x${q}, ${R(amt)}`, () => removeSale(r.id));
+};
+$('plSearch').oninput = e => { plQ = e.target.value; renderPrices(); };
 $('expForm').onsubmit = e => {
   e.preventDefault();
   const a = Math.round(parseFloat(String($('eAmt').value).replace(',', '.')) * 100) / 100;
   if (!(a > 0) || !$('eDesc').value.trim()) { toast('Fill in what it was for and the amount'); return; }
-  const x = { id: newId(), date: $('eDate').value || TODAY(), desc: $('eDesc').value.trim(), cat: form.eCat, amount: a, pay: form.ePay };
+  const x = { id: newId(), date: $('eDate').value || TODAY(), desc: $('eDesc').value.trim(), cat: form.eCat, amount: a, pay: form.ePay, account: form.eAcc };
   S.exp.push(x); queue('addExpense', x); $('eAmt').value = ''; $('eDesc').value = ''; render();
-  toast(`Expense added, ${R(a)}`, () => { S.exp = S.exp.filter(y => y.id !== x.id); queue('delExpense', { id: x.id }); });
+  toast(`${x.account} expense added, ${R(a)}`, () => { S.exp = S.exp.filter(y => y.id !== x.id); queue('delExpense', { id: x.id }); });
 };
 $('expT').onclick = e => {
   const b = e.target.closest('[data-dele]'); if (!b) return;
@@ -724,6 +827,7 @@ $('v-prices').addEventListener('change', e => {
   const t = e.target, price = Math.max(0, +t.value || 0);
   if (t.dataset.sp) { svcBy(t.dataset.sp).price = price; queue('setPrice', { kind: 'svc', code: t.dataset.sp, price }); toast('Price updated'); }
   if (t.dataset.pp) { prodBy(t.dataset.pp).price = price; queue('setPrice', { kind: 'prod', code: t.dataset.pp, price }); toast('Price updated'); }
+  if (t.dataset.ip) { iconBy(t.dataset.ip).price = price; queue('setPrice', { kind: 'icon', code: t.dataset.ip, price }); toast('Icon price updated'); }
 });
 $('refresh').onclick = () => { lastErr = ''; load().then(ok => toast(ok ? 'Up to date with the sheet' : 'Could not refresh right now')); };
 $('signout').onclick = () => { if (outbox.length) { toast('Wait until everything is saved before signing out'); return; } signOut(); };
@@ -736,13 +840,23 @@ function copyOut(text, label) {
 $('cpSum').onclick = () => {
   const m = $('mPick').value, { ex, t, exTot } = monthData(m), name = $('mPick').selectedOptions[0].textContent;
   const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount;
-  copyOut([`${S.salon} takings - ${name}`, `Services: ${R(t.svc)}`, `Products: ${R(t.prod)}`, `Total takings: ${R(t.all)}`, '  ' + S.pays.map(p => `${p} ${R(t[p] || 0)}`).join(' | '), `Clients: ${t.clients.size}`, '', `Expenses: ${R(exTot)}`, ...Object.entries(ec).map(([k, v]) => `  ${k}: ${R(v)}`)].join('\n'), 'Summary');
+  const sx = ex.filter(e => accOf(e) === 'Salon'), sec = {}; for (const e of sx) sec[e.cat] = (sec[e.cat] || 0) + e.amount;
+  const st = t.L.Salon, sxt = sx.reduce((a, e) => a + e.amount, 0);
+  copyOut([`${S.salon} - ${name}`, '', `SALON (${BANK('Salon')})`, `Services: ${R(t.svc)}`, `Salon products: ${R(t.prod)}`, `Salon takings: ${R(st.all)}`, '  ' + S.pays.map(p => `${p} ${R(st[p] || 0)}`).join(' | '), `Clients: ${t.clients.size}`, `Salon expenses: ${R(sxt)}`, ...Object.entries(sec).map(([k, v]) => `  ${k}: ${R(v)}`), '', ...iconSummary(m, false)].join('\n'), 'Summary');
+};
+function iconSummary(m, head) {
+  const { rows, ex, t } = monthData(m), name = $('mPick').selectedOptions[0].textContent, ic = t.L.Icon;
+  const ix = ex.filter(e => accOf(e) === 'Icon'), ixt = ix.reduce((a, e) => a + e.amount, 0), cashEx = ix.filter(e => e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
+  const lines = rows.filter(r => lineOf(r) === 'Icon').sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => `  ${r.date} ${r.codes[0]} ${nameOf(r, r.codes[0])} x${r.qty} ${R(r.amount)} (${r.pay})`);
+  return [...(head ? [`${S.salon} - ${name}`, ''] : []), `ICON (${BANK('Icon')})`, `Icon sales: ${R(ic.all)}`, '  ' + S.pays.map(p => `${p} ${R(ic[p] || 0)}`).join(' | '), `Icon expenses paid: ${R(ixt)}`, `Icon left after expenses: ${R(ic.all - ixt)}`, `Icon markup on products sold: ${R(ic.all - ic.cost)} (trade price ${R(ic.cost)})`, `To transfer ${BANK('Salon')} -> ${BANK('Icon')} (card + EFT): ${R((ic.Card || 0) + (ic.EFT || 0))}`, `Icon cash to deposit in ${BANK('Icon')}: ${R((ic.Cash || 0) - cashEx)}`, ...(lines.length ? ['', 'Icon sales:', ...lines] : [])];
+}
+$('cpIcon').onclick = () => { copyOut(iconSummary($('mPick').value, true).join('\n'), 'Icon summary');
 };
 $('cpCsv').onclick = () => {
   const m = $('mPick').value, { rows, ex } = monthData(m), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
-  const lines = ['Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by,Notes',
-    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => ((svcBy(c) || prodBy(c)) || {}).name || c).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay, q(r.notes || '')].join(',')),
-    ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => ['Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay, ''].join(','))];
+  const lines = ['Account,Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by,Notes',
+    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [lineOf(r), r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => nameOf(r, c)).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay, q(r.notes || '')].join(',')),
+    ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => [accOf(e), 'Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay, ''].join(','))];
   copyOut(lines.join('\n'), 'All lines');
 };
 
