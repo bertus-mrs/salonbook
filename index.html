@@ -141,6 +141,18 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 @media(max-width:860px){.cl{grid-template-columns:minmax(0,1fr)}.cscroll{max-height:40vh}}
 .err{color:var(--berry);font-weight:600}
 [hidden]{display:none!important}
+.tr{display:flex;gap:6px;align-items:center}
+.eye{font-size:13px;border-radius:999px;padding:4px 10px;background:var(--bg);color:var(--berry);white-space:nowrap;border:1px solid var(--line);cursor:pointer;min-height:30px;display:inline-flex;gap:5px;align-items:center}
+.eye svg{width:16px;height:16px}
+.eye[aria-pressed=true]{background:var(--berry);color:var(--bg);border-color:var(--berry)}
+.sub{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sub button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 16px;min-height:42px;font:600 15px Inter,sans-serif;color:var(--mut);cursor:pointer}
+.sub button[aria-selected=true]{background:var(--berry);border-color:var(--berry);color:var(--bg)}
+.cover{max-width:460px;margin:30px auto;text-align:center;padding:28px 22px}
+.cover h2{font-size:28px;color:var(--berry);margin-bottom:10px}
+.cover .btn{font-size:17px;padding:12px 26px;margin:14px 0 6px}
+.lock{width:44px;height:44px;color:var(--berry);margin-bottom:6px}
+nav button.money{margin-left:auto}
 .gate{position:fixed;inset:0;background:var(--blush);display:grid;place-items:center;padding:24px;z-index:5}
 .gate .card{width:min(100%,380px);background:var(--bg)}
 .gate h1{margin-bottom:6px}
@@ -191,14 +203,13 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
   </form>
 </div>
 <header>
-  <div class="top"><h1 id="salonName">Salon Book</h1><button class="sync" id="sync" title="Tap to sync now">Loading</button></div>
+  <div class="top"><h1 id="salonName">Salon Book</h1><div class="tr"><button type="button" class="eye" id="eye" aria-pressed="false"></button><button class="sync" id="sync" title="Tap to sync now">Loading</button></div></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-v="day" aria-selected="true">Day book</button>
     <button role="tab" data-v="clients" aria-selected="false">Clients</button>
     <button role="tab" data-v="shop" aria-selected="false">Sell product</button>
-    <button role="tab" data-v="exp" aria-selected="false">Expenses</button>
-    <button role="tab" data-v="month" aria-selected="false">Month-end</button>
     <button role="tab" data-v="prices" aria-selected="false">Price list</button>
+    <button role="tab" data-v="money" aria-selected="false" class="money">&#128274; Money</button>
   </nav>
 </header>
 <main>
@@ -243,19 +254,27 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
     <div class="card"><h3>Products on the shelf</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Price</th><th class="n">Sold this month</th><th class="n">Left</th></tr></thead><tbody id="stockT"></tbody></table></div><p class="note">"Left" is the StartStock in the sheet minus everything sold since.</p></div>
   </div>
 </section>
-<section id="v-exp" hidden>
-  <div class="grid2">
-    <form class="card" id="expForm"><h3>Add an expense</h3>
-      <div class="two"><div><label for="eDate">Date</label><input id="eDate" type="date"></div><div><label for="eAmt">Amount (R)</label><input id="eAmt" type="number" min="0" step="0.01" inputmode="decimal"></div></div>
-      <label for="eDesc">What was it for</label><input id="eDesc" placeholder="e.g. foils and gloves">
-      <label>Type</label><div class="chips" id="eCat"></div>
-      <label>Paid by</label><div class="chips" id="ePay"></div>
-      <button class="btn" style="width:100%;margin-top:16px">Add expense</button>
-    </form>
-    <div class="card"><h3 id="expTitle">Expenses</h3><div class="scroll"><table><thead><tr><th>Date</th><th>What</th><th>Type</th><th class="n">Amount</th><th></th></tr></thead><tbody id="expT"></tbody></table></div></div>
+<section id="v-money" hidden>
+  <div id="mCover" class="card cover">
+    <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <h2>Money is private</h2>
+    <p class="note" style="font-size:15px">Takings, expenses and the month-end pack stay hidden so nobody can read them over your shoulder.</p>
+    <button type="button" class="btn" id="mShow">Show figures</button>
+    <p class="note">They hide again by themselves when you leave this tab, close the app, or after 3 minutes.</p>
   </div>
-</section>
-<section id="v-month" hidden>
+  <div id="mBody" hidden>
+  <div class="sub" role="tablist" id="mtabs">
+    <button role="tab" data-m="mday" aria-selected="true">Day takings</button>
+    <button role="tab" data-m="month" aria-selected="false">Month-end</button>
+    <button role="tab" data-m="exp" aria-selected="false">Expenses</button>
+    <button type="button" class="linkish note" id="mHide" style="margin-left:auto;padding:8px 4px">Hide figures</button>
+  </div>
+  <div id="p-mday">
+    <div class="dayhead"><h2 id="mdTitle"></h2><div class="nav2"><button class="btn ghost" id="mdPrev" aria-label="Previous day">&lsaquo;</button><input type="date" id="mdPick" style="width:auto"><button class="btn ghost" id="mdNext" aria-label="Next day">&rsaquo;</button><button class="btn ghost" id="mdToday">Today</button></div></div>
+    <div class="strip" id="mdStrip"></div>
+    <div class="grid2"><div class="card"><h3>Takings per stylist</h3><div class="bars" id="mdSty"></div></div><div class="card"><h3>How clients paid</h3><div class="bars" id="mdPay"></div></div></div>
+  </div>
+  <div id="p-month" hidden>
   <div class="dayhead"><h2 id="mTitle"></h2><select id="mPick" style="width:auto" aria-label="Month"></select></div>
   <div class="grid2">
     <div class="card"><small class="note">Total takings this month</small><div class="fig-n big" id="mTot"></div><div class="strip" id="mStrip" style="margin:14px 0 0"></div></div>
@@ -269,6 +288,20 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
   </div>
   <h3 style="margin:26px 0 10px;font-size:22px">Day by day</h3>
   <div class="scroll card" style="padding:4px 8px"><table><thead><tr><th>Day</th><th class="n">Clients</th><th class="n">Services</th><th class="n">Products</th><th class="n">Cash</th><th class="n">Card</th><th class="n">EFT</th><th class="n">Total</th></tr></thead><tbody id="mDays"></tbody></table></div>
+</div>
+<div id="p-exp" hidden>
+  <div class="grid2">
+    <form class="card" id="expForm"><h3>Add an expense</h3>
+      <div class="two"><div><label for="eDate">Date</label><input id="eDate" type="date"></div><div><label for="eAmt">Amount (R)</label><input id="eAmt" type="number" min="0" step="0.01" inputmode="decimal"></div></div>
+      <label for="eDesc">What was it for</label><input id="eDesc" placeholder="e.g. foils and gloves">
+      <label>Type</label><div class="chips" id="eCat"></div>
+      <label>Paid by</label><div class="chips" id="ePay"></div>
+      <button class="btn" style="width:100%;margin-top:16px">Add expense</button>
+    </form>
+    <div class="card"><h3 id="expTitle">Expenses</h3><div class="scroll"><table><thead><tr><th>Date</th><th>What</th><th>Type</th><th class="n">Amount</th><th></th></tr></thead><tbody id="expT"></tbody></table></div></div>
+  </div>
+</div>
+  </div>
 </section>
 <section id="v-prices" hidden>
   <div class="grid2">
@@ -311,6 +344,13 @@ let outbox = ls.get(K_OUT, []);
 let day = TODAY(), view = 'day', lastNew = '';
 const form = { stylist: '', pay: '', sProd: '', sPay: '', eCat: 'Consumables', ePay: 'Cash', grp: '' };
 let amtTouched = false;
+/* privacy: every rand figure except the price being charged now and the public price list is masked until she taps Show */
+let showMoney = false, moneyT, mview = 'mday';
+const M = n => showMoney ? R(n) : 'R \u2022\u2022\u2022';
+const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 4M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a10 10 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function eyeBtn() { const b = $('eye'); b.innerHTML = showMoney ? EYE_OFF + 'Hide amounts' : EYE + 'Show amounts'; b.setAttribute('aria-pressed', showMoney); }
+function setMoney(on) { showMoney = on; clearTimeout(moneyT); if (on) moneyT = setTimeout(() => setMoney(false), 180000); eyeBtn(); render(); }
 let clientSel = '', clientQ = '', noteEdit = '';
 const FORMULA = 'Colour/mix: \nDeveloper: \nTime on: \nResult / next time: ';
 
@@ -395,7 +435,7 @@ function resolveClient(name) {
   return nc.id;
 }
 function visitsOf(c) { return S.sales.filter(x => x.clientId ? x.clientId === c.id : (norm(x.client) === norm(fullName(c)) || (!c.surname && norm(x.client) === norm(c.name)))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); }
-function lastVisitText(c) { const v = visitsOf(c).find(x => x.kind === 'svc'); return v ? `${dshort(v.date)}: ${v.codes.join('+')} (${R(v.amount)})` : 'no visits yet'; }
+function lastVisitText(c) { const v = visitsOf(c).find(x => x.kind === 'svc'); return v ? `${dshort(v.date)}: ${v.codes.join('+')} (${M(v.amount)})` : 'no visits yet'; }
 const prodBy = c => S.products.find(p => p.code === c);
 const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
 const dayRows = d => S.sales.filter(x => x.date === d).sort((a, b) => String(a.time).localeCompare(String(b.time)));
@@ -417,12 +457,12 @@ function renderDay() {
   if (!$('fTime').value) $('fTime').value = nowTime();
   const rows = dayRows(day), t = totals(rows);
   const cashExp = S.exp.filter(e => e.date === day && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
-  $('dayStrip').innerHTML = `<div class="tot"><small>Day total</small><span class="fig-n">${R(t.all)}</span></div><div><small>Clients</small><span class="fig-n">${t.clients.size}</span></div>` +
-    S.pays.map(p => `<div><small>${esc(p)}</small><span class="fig-n">${R(t[p] || 0)}</span></div>`).join('') +
-    (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
+  const nSvc = rows.filter(r => r.kind === 'svc').length, nProd = rows.filter(r => r.kind === 'prod').reduce((a, r) => a + r.qty, 0);
+  const tm = rows.map(r => r.time).filter(Boolean).sort();
+  $('dayStrip').innerHTML = `<div><small>Clients</small><span class="fig-n">${t.clients.size}</span></div><div><small>Services done</small><span class="fig-n">${nSvc}</span></div><div><small>Products sold</small><span class="fig-n">${nProd}</span></div><div><small>First / last</small><span class="fig-n">${tm.length ? esc(tm[0]) + (tm.length > 1 ? ' \u2013 ' + esc(tm[tm.length - 1]) : '') : '-'}</span></div>`;
   const wd = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' }).slice(0, 3).toLowerCase();
   const closed = (S.closed || []).some(c => c.slice(0, 3).toLowerCase() === wd);
-  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${R(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
+  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : esc((prodBy(r.codes[0]) || {}).name || 'Product') + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${r.kind === 'prod' ? ' p' : ''}" title="${esc(((svcBy(c) || prodBy(c)) || {}).name || c)}">${esc(c)}</span>`).join('')}</span><span class="amt">${M(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
     : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
   chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
   $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(fullName(c))}">${esc(c.phone)}</option>`).join('');
@@ -481,7 +521,7 @@ function renderClients() {
   $('cBdays').innerHTML = ub.length ? `<b>🎂 Birthdays in the next 2 weeks</b>` + ub.map(o => `<button type="button" class="bdi" data-cid="${esc(o.c.id)}"><span>${esc(fullName(o.c))}${o.x.age ? ' <small>turns ' + o.x.age + '</small>' : ''}</span><span class="${o.x.days === 0 ? 'today' : ''}">${esc(bdWhen(o.x))}</span></button>`).join('') : '';
   $('cBdays').hidden = !ub.length;
   $('cCount').textContent = `${shown.length} of ${list.length} clients, most recent visit first`;
-  $('cList').innerHTML = shown.map(x => `<button type="button" class="ci" data-cid="${esc(x.c.id)}" aria-current="${x.c.id === clientSel}"><span><b>${esc(fullName(x.c))}</b><small>${x.n} visit${x.n === 1 ? '' : 's'}${x.last ? ' · last ' + esc(dshort(x.last)) : ''}</small></span><span class="amt">${R(x.tot)}</span></button>`).join('') || '<p class="note">No client found.</p>';
+  $('cList').innerHTML = shown.map(x => `<button type="button" class="ci" data-cid="${esc(x.c.id)}" aria-current="${x.c.id === clientSel}"><span><b>${esc(fullName(x.c))}</b><small>${x.n} visit${x.n === 1 ? '' : 's'}${x.last ? ' · last ' + esc(dshort(x.last)) : ''}</small></span><span class="amt">${M(x.tot)}</span></button>`).join('') || '<p class="note">No client found.</p>';
   if (clientSel === 'NEW') { $('cDetail').innerHTML = `<h2>New client</h2>${clientForm({ name: '', surname: '', phone: '', birthday: '', notes: '' })}<div class="nrow" style="margin-top:12px"><button type="button" class="btn" id="cAdd">Add client</button><button type="button" class="linkish" id="cCancel">Cancel</button></div>`; return; }
   const c = clientById(clientSel);
   if (!c) { $('cDetail').innerHTML = '<p class="note">Pick a client to see their history, or add a new client.</p>'; return; }
@@ -495,12 +535,12 @@ function renderClients() {
     ${bx && bx.days <= 14 ? `<div class="bdnote">🎂 Birthday ${esc(bdWhen(bx))}${bx.age ? ': turns ' + bx.age : ''}!</div>` : ''}
     ${c.notes ? `<div class="cnote">${esc(c.notes)}</div>` : ''}
     ${(() => { const ln = v.find(x => x.notes); return ln ? `<div class="lastnote"><b>Last visit note (${esc(dshort(ln.date))}, ${esc(ln.codes.join('+'))}):</b>\n${esc(ln.notes)}</div>` : ''; })()}
-    <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${R(tot)}</b></div><div><small>Average visit</small><b>${R(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
+    <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${M(tot)}</b></div><div><small>Average visit</small><b>${M(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
     <details${missing ? ' open' : ''}><summary class="note" style="cursor:pointer">${missing ? 'Add ' + [!c.phone && 'phone number', !c.birthday && 'birthday'].filter(Boolean).join(' and ') : 'Edit client details'}</summary>
       ${clientForm(c)}
       <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
     <h3 style="margin:18px 0 4px">History</h3>
-    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${R(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
+    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${x.kind === 'prod' ? ' p' : ''}">${esc(code)}</span>`).join('')}</span><div>${esc(x.codes.map(code => ((svcBy(code) || prodBy(code)) || {}).name || code).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${M(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
   if (draft && $('nText')) { $('nText').value = draft[0]; if (draft[1]) $('nText').focus(); }
 }
 function renderShop() {
@@ -544,14 +584,30 @@ function renderMonth() {
   $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
     `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
 }
+function renderMoneyDay() {
+  $('mdTitle').textContent = dname(day) + (day === TODAY() ? ' (today)' : ''); $('mdPick').value = day;
+  const rows = dayRows(day), t = totals(rows);
+  const cashExp = S.exp.filter(e => e.date === day && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
+  $('mdStrip').innerHTML = `<div class="tot"><small>Day total</small><span class="fig-n">${R(t.all)}</span></div><div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Products</small><span class="fig-n">${R(t.prod)}</span></div>` +
+    (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
+  bars('mdPay', S.pays.map(p => [p, t[p] || 0]));
+  bars('mdSty', S.stylists.map(st => [st, rows.filter(r => r.stylist === st && r.kind === 'svc').reduce((a, r) => a + r.amount, 0)]));
+}
+function renderMoney() {
+  $('mCover').hidden = showMoney; $('mBody').hidden = !showMoney;
+  if (!showMoney) return;
+  for (const b of $('mtabs').querySelectorAll('[data-m]')) b.setAttribute('aria-selected', b.dataset.m === mview);
+  for (const k of ['mday', 'month', 'exp']) $('p-' + k).hidden = k !== mview;
+  ({ mday: renderMoneyDay, month: renderMonth, exp: renderExp })[mview]();
+}
 function renderPrices() {
   $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}${s.varies ? ' <span class="from">(from)</span>' : ''}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
-  $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${R(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
+  $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${M(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
 }
 function render() {
   if (!S) return;
   $('salonName').textContent = S.salon || 'Salon Book'; document.title = S.salon || 'Salon Book';
-  ({ day: renderDay, clients: renderClients, shop: renderShop, exp: renderExp, month: renderMonth, prices: renderPrices })[view]();
+  ({ day: renderDay, clients: renderClients, shop: renderShop, money: renderMoney, prices: renderPrices })[view]();
 }
 
 /* ---------- actions ---------- */
@@ -559,7 +615,7 @@ let undoFn = null, toastT;
 function toast(msg, undo) { $('toastMsg').textContent = msg; undoFn = undo; $('undo').hidden = !undo; $('toast').hidden = false; clearTimeout(toastT); toastT = setTimeout(() => $('toast').hidden = true, 5000); }
 $('undo').onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); } $('toast').hidden = true; };
 
-$('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
+$('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (view === 'money' && b.dataset.v !== 'money' && showMoney) { showMoney = false; clearTimeout(moneyT); eyeBtn(); } view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
 $('prev').onclick = () => { day = addDays(day, -1); render(); }; $('next').onclick = () => { day = addDays(day, 1); render(); }; $('today').onclick = () => { day = TODAY(); render(); };
 $('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
 $('fClient').oninput = clientInfo;
@@ -614,6 +670,14 @@ $('fCodes').oninput = () => { amtTouched = false; formPrice(); };
 $('fAmtIn').oninput = () => { amtTouched = true; };
 $('codeBtns').onclick = e => { const b = e.target.closest('[data-add]'); if (!b) return; const cur = parseCodes($('fCodes').value); cur.push(b.dataset.add); $('fCodes').value = cur.join('+'); amtTouched = false; formPrice(); };
 $('sync').onclick = () => { lastErr = ''; load(); };
+$('eye').onclick = () => setMoney(!showMoney);
+$('mShow').onclick = () => setMoney(true);
+$('mHide').onclick = () => setMoney(false);
+$('mtabs').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; mview = b.dataset.m; render(); };
+$('mdPrev').onclick = () => { day = addDays(day, -1); render(); }; $('mdNext').onclick = () => { day = addDays(day, 1); render(); }; $('mdToday').onclick = () => { day = TODAY(); render(); };
+$('mdPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
+document.addEventListener('visibilitychange', () => { if (document.hidden && showMoney) setMoney(false); });
+document.addEventListener('pointerdown', () => { if (showMoney) { clearTimeout(moneyT); moneyT = setTimeout(() => setMoney(false), 180000); } }, true);
 
 function addSale(r) { S.sales.push(r); lastNew = r.id; queue('addSale', { id: r.id, date: r.date, time: r.time, type: r.kind === 'svc' ? 'Service' : 'Product', client: r.client, stylist: r.stylist, codes: r.codes.join('+'), qty: r.qty, amount: r.amount, pay: r.pay, notes: r.notes || '', clientId: r.clientId || '' }); }
 function removeSale(id) { const r = S.sales.find(x => x.id === id); if (!r) return; S.sales = S.sales.filter(x => x.id !== id); queue('delSale', { id }); render(); toast('Line removed', () => { S.sales.push(r); queue('undelSale', { id }); }); }
@@ -690,6 +754,7 @@ $('gateForm').onsubmit = async e => {
   $('gateBtn').disabled = false; $('gateBtn').textContent = 'Open the book';
   if (ok) { ls.set(K_PIN, pin); $('gate').hidden = true; $('pin').value = ''; }
 };
+eyeBtn();
 if (pin && S) { $('gate').hidden = true; render(); status(); load(); }
 else if (pin) { $('gate').hidden = true; load().then(ok => { if (!ok && !S) { $('gate').hidden = false; } }); }
 else { $('gate').hidden = false; status(); }
