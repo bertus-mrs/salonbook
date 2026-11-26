@@ -91,7 +91,7 @@ textarea{width:100%;min-height:160px;font:13px/1.4 ui-monospace,monospace;border
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px #0003}
 .toast button{background:none;border:0;color:var(--bg);font-weight:700;text-decoration:underline;cursor:pointer;min-height:36px}
 @media(prefers-reduced-motion:no-preference){.row.new{animation:ink .8s ease-out}@keyframes ink{from{background:var(--blush)}to{background:transparent}}}
-@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}.cols .card{order:-1}}
+@media(max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.row{grid-template-columns:3em minmax(0,1fr) auto 32px}.row .codes{grid-column:2/4;justify-content:flex-start;order:5}.bars .b{grid-template-columns:minmax(5em,7em) minmax(0,1fr) auto}table{font-size:13px}th,td{padding:6px 4px}}
 </style>
 <style>
@@ -133,8 +133,8 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 .bdrow{display:grid;grid-template-columns:5.5em 1fr 5.5em;gap:8px}
 .bdays{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#fff6db;border:1px solid #f0d78a;font-size:15px}
 .bdlist{margin:10px 0;padding:10px 12px;border-radius:12px;background:#fff6db;border:1px solid #f0d78a}
-.bdi{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;background:none;padding:8px 2px;border-top:1px solid #f0e2b0;cursor:pointer;color:var(--ink);text-align:left;font-size:15px}
-.bdi small{color:var(--mut)}.bdi .today{color:var(--berry);font-weight:700}
+.bdi{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;background:none;padding:8px 2px;border-top:1px solid #f0e2b0;cursor:pointer;color:#2a2205;text-align:left;font-size:15px}
+.bdi small{color:#6b5a1e}.bdi .today{color:#a3164a;font-weight:700}
 .bdnote{margin:10px 0;padding:8px 12px;border-radius:10px;background:#fff6db;border:1px solid #f0d78a;font-weight:600}
 .cnote{background:color-mix(in srgb,var(--cu) 14%,transparent);border-radius:10px;padding:10px 12px;margin:10px 0;white-space:pre-wrap}
 .linkish{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left}
@@ -142,6 +142,58 @@ header{padding-top:max(18px,env(safe-area-inset-top))}
 @media(max-width:860px){.cl{grid-template-columns:minmax(0,1fr)}.cscroll{max-height:40vh}}
 .err{color:var(--berry);font-weight:600}
 [hidden]{display:none!important}
+/* birthdays: dark ink on the yellow note, in light and dark phone modes */
+.bdays,.bdlist,.bdnote{color:#2a2205}.bdays b,.bdays .linkish,.bdlist b,.bdnote b{color:#2a2205}
+/* diary */
+.dayhead2{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dnav{display:flex;align-items:center;gap:6px;min-width:0}
+.dtitle{position:relative;min-width:0}
+.dtitle h2{font-size:clamp(20px,2.6vw,28px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dpick{position:absolute;inset:0;opacity:0;cursor:pointer;min-height:0;padding:0}
+.dact{display:flex;gap:6px}
+.btn.sm{min-height:38px;padding:6px 12px}
+.dsum{margin:0 0 10px;font-size:14px;color:var(--mut)}
+.dsum b{color:var(--ink);font-weight:600}
+.row .who>.linkish,.row .who>span{display:block}
+.diary .row{grid-template-columns:3.4em minmax(0,1fr) auto auto 38px;border-left:4px solid transparent}
+.diary .row.st-booked{border-left-color:color-mix(in srgb,var(--berry) 55%,transparent);background:color-mix(in srgb,var(--berry) 4%,transparent)}
+.diary .row.st-part{border-left-color:var(--cu)}
+.diary .row.next .t::after{content:'next';display:block;font:600 10px Inter,sans-serif;color:var(--bg);background:var(--berry);border-radius:4px;padding:0 4px;width:max-content;margin-top:2px}
+.stp{font-size:11px;font-weight:700;border-radius:5px;padding:1px 6px;white-space:nowrap}
+.stp.booked{background:color-mix(in srgb,var(--berry) 14%,transparent);color:var(--berry)}
+.stp.part{background:color-mix(in srgb,var(--cu) 18%,transparent);color:var(--cu)}
+.more{border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:18px;line-height:1;cursor:pointer;width:38px;height:38px;border-radius:10px}
+.more[aria-expanded=true]{background:var(--berry);color:var(--bg);border-color:var(--berry)}
+.acts{grid-column:1/-1;display:grid;gap:10px;padding:10px 2px 4px;border-top:1px dashed var(--line);margin-top:4px}
+.acts h4{margin:0;font:600 13px Inter,sans-serif;color:var(--mut)}
+.arow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.arow input{width:auto;min-height:40px;padding:6px 8px}
+.arow input[type=number]{width:7em}
+.plist{font-size:14px;margin:0;padding:0;list-style:none}.plist li{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:3px 0}
+@media(max-width:600px){.diary .row{grid-template-columns:3em minmax(0,1fr) auto 38px}.diary .row .codes{grid-column:2/4;justify-content:flex-start;order:5}}
+/* booking form slides up as a sheet on phones */
+.shead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.shead h3{margin:0}
+@media(max-width:860px){
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-height:92vh;overflow-y:auto;z-index:30;border-radius:18px 18px 0 0;transform:translateY(110%);visibility:hidden;transition:transform .25s,visibility .25s;box-shadow:0 -10px 30px #0005;padding-bottom:max(18px,env(safe-area-inset-bottom));background:var(--bg)}
+  .sheet.open{transform:none;visibility:visible}
+  .sheetbg{position:fixed;inset:0;background:#0007;z-index:29}
+}
+@media(min-width:861px){#fClose{display:none}.sheetbg{display:none!important}.cols>.sheet{position:sticky;top:12px}}
+/* invoice panel */
+.panel{position:fixed;inset:0;z-index:40;background:#0007;display:grid;place-items:end center;padding:0}
+.panel>.card{width:min(100%,560px);max-height:94vh;overflow-y:auto;border-radius:18px 18px 0 0;background:var(--bg);padding-bottom:max(18px,env(safe-area-inset-bottom))}
+@media(min-width:861px){.panel{place-items:center}.panel>.card{border-radius:18px}}
+.ilines label{display:flex;gap:10px;align-items:flex-start;margin:0;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px;color:var(--ink)}
+.ilines input{width:auto;min-height:0;margin-top:3px}
+.ilines .n{margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
+.itot{display:grid;grid-template-columns:1fr auto;gap:2px 14px;margin:12px 0;font-size:15px}.itot b{font-variant-numeric:tabular-nums;text-align:right}
+/* price list editing */
+.addf{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5em,1fr));gap:6px 8px;margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:12px}
+.addf label{margin:0 0 2px}.addf .btn{align-self:end}
+.addf .wide{grid-column:span 2}
+.rm{border:0;background:none;color:var(--mut);font-size:18px;cursor:pointer;width:34px;height:34px;border-radius:8px}.rm:hover{background:var(--blush);color:var(--berry)}
+.stk{display:flex;gap:4px;align-items:center;justify-content:flex-end}.stk input{width:4.5em;min-height:34px;padding:4px 6px}
+td input.cost{max-width:6em}
 .tr{display:flex;gap:6px;align-items:center}
 .eye{font-size:13px;border-radius:999px;padding:4px 10px;background:var(--bg);color:var(--berry);white-space:nowrap;border:1px solid var(--line);cursor:pointer;min-height:30px;display:inline-flex;gap:5px;align-items:center}
 .eye svg{width:16px;height:16px}
@@ -231,25 +283,30 @@ nav button.money{margin-left:auto}
 </header>
 <main>
 <section id="v-day">
-  <div class="dayhead"><h2 id="dayTitle"></h2><div class="nav2"><button class="btn ghost" id="prev" aria-label="Previous day">‹</button><input type="date" id="dayPick" style="width:auto"><button class="btn ghost" id="next" aria-label="Next day">›</button><button class="btn ghost" id="today">Today</button></div></div>
-  <div class="strip" id="dayStrip"></div>
+  <div class="dayhead2">
+    <div class="dnav"><button class="btn ghost sm" id="prev" aria-label="Previous day">&lsaquo;</button><div class="dtitle"><h2 id="dayTitle"></h2><input type="date" id="dayPick" class="dpick" aria-label="Pick a day"></div><button class="btn ghost sm" id="next" aria-label="Next day">&rsaquo;</button></div>
+    <div class="dact"><button class="btn ghost sm" id="today">Today</button><button class="btn sm" id="newBk">+ New booking</button></div>
+  </div>
+  <p class="dsum" id="daySum"></p>
   <p id="dayBdays" class="bdays" hidden></p>
   <div class="cols">
-    <div class="page" id="dayPage"></div>
-    <form class="card" id="addForm">
-      <h3>Write in the book</h3>
-      <div class="two"><div><label for="fTime">Time</label><input id="fTime" type="time"></div><div><label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off" list="clientList"></div></div>
+    <div class="page diary" id="dayPage"></div>
+    <div class="sheetbg" id="sheetBg" hidden></div>
+    <form class="card sheet" id="addForm">
+      <div class="shead"><h3>New booking</h3><button type="button" class="x" id="fClose" aria-label="Close">&times;</button></div>
+      <div class="two"><div><label for="fDate">Day</label><input id="fDate" type="date"></div><div><label for="fTime">Time</label><input id="fTime" type="time"></div></div>
+      <label for="fClient">Client</label><input id="fClient" placeholder="Name" autocomplete="off" list="clientList">
       <datalist id="clientList"></datalist>
       <p class="note" id="fClientInfo"></p>
       <label>Stylist</label><div class="chips" id="fStylist"></div>
       <label for="fCodes">Service codes (tap, or type e.g. CM+BT)</label><input id="fCodes" autocomplete="off" style="text-transform:uppercase">
       <div class="chips grp" id="grpBtns" style="margin-top:10px"></div>
       <div class="chips" id="codeBtns" style="margin-top:8px"></div>
-      <label>Paid by</label><div class="chips" id="fPay"></div>
-      <div class="price"><span id="fDesc" class="note">No service yet</span><label class="amtl" for="fAmtIn">R<input id="fAmtIn" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="Amount charged"></label></div>
-      <p class="note" id="fVary" hidden>Price varies with length and thickness: check the amount before adding.</p>
+      <label>Paid?</label><div class="chips" id="fPay"></div>
+      <div class="price"><span id="fDesc" class="note">No service yet</span><label class="amtl" for="fAmtIn">R<input id="fAmtIn" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="Price"></label></div>
+      <p class="note" id="fVary" hidden>Price varies with length and thickness: check the amount before saving.</p>
       <label for="fNotes">Notes for this visit (formula, what was done)</label><textarea id="fNotes" rows="2" class="ta" placeholder="e.g. 7.1 + 6%, 35 min"></textarea>
-      <button class="btn" style="width:100%">Add to book</button>
+      <button class="btn" style="width:100%;margin-top:12px" id="fSave">Save booking</button>
     </form>
   </div>
 </section>
@@ -305,7 +362,8 @@ nav button.money{margin-left:auto}
   <div class="dayhead"><h2 id="mTitle"></h2><select id="mPick" style="width:auto" aria-label="Month"></select></div>
   <div class="grid2">
     <div class="card icard" style="grid-column:1/-1"><h3>Salon and Icon, kept apart</h3><div class="scroll"><table class="split" id="mSplit"></table></div><div class="move" id="mMove"></div></div>
-    <div class="card"><small class="note">Total takings this month</small><div class="fig-n big" id="mTot"></div><div class="strip" id="mStrip" style="margin:14px 0 0"></div></div>
+    <div class="card"><h3>Still to be paid</h3><div id="mOwed"></div></div>
+    <div class="card"><small class="note">Money taken this month</small><div class="fig-n big" id="mTot"></div><div class="strip" id="mStrip" style="margin:14px 0 0"></div></div>
     <div class="card"><h3>How clients paid</h3><div class="bars" id="mPay"></div><p class="note" id="mCash"></p></div>
     <div class="card"><h3>Takings per stylist</h3><div class="bars" id="mSty"></div></div>
     <div class="card"><h3>Top services</h3><div class="bars" id="mSvc"></div></div>
@@ -334,15 +392,32 @@ nav button.money{margin-left:auto}
 </section>
 <section id="v-prices" hidden>
   <div class="grid2">
-    <div class="card"><h3>Services and codes</h3><p class="note">The letters are the shorthand written in the book. Prices marked "from" can be changed when booking. A changed price is used from the next booking on; old bookings keep the price they were sold at. New services are added in the Services tab of the sheet.</p><div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th>Group</th><th class="n">Price (R)</th></tr></thead><tbody id="svcT"></tbody></table></div></div>
-    <div class="card"><h3>Retail products</h3><div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Cost (R)</th><th class="n">Sell (R)</th></tr></thead><tbody id="prodT"></tbody></table></div>
-      <h3 style="margin-top:22px"><span class="code i">Icon</span> Icon price list</h3><p class="note">From Icon's 2026 price list. Trade is what she pays Icon; Retail is the selling price (change it here if she sells for less). To hide products she never sells, put N in the Active column of the Icon tab in the sheet.</p>
+    <div class="card"><h3>Services and codes</h3><p class="note">Change a price and it is saved straight away; old bookings keep the price they were sold at. Tap &times; to take a service off the list (her history keeps it).</p>
+      <div class="scroll"><table><thead><tr><th>Code</th><th>Service</th><th class="n">Price (R)</th><th></th></tr></thead><tbody id="svcT"></tbody></table></div>
+      <form class="addf" id="addSvc"><div><label for="nsCode">Code</label><input id="nsCode" placeholder="e.g. TX" style="text-transform:uppercase" autocomplete="off"></div><div class="wide"><label for="nsName">Service</label><input id="nsName" placeholder="e.g. Toner and blowave" autocomplete="off"></div><div><label for="nsGroup">Group</label><input id="nsGroup" list="grpList" autocomplete="off"></div><div><label for="nsPrice">Price (R)</label><input id="nsPrice" type="number" min="0" inputmode="numeric"></div><div><label><input type="checkbox" id="nsVar" style="width:auto;min-height:0"> "from" price</label><button class="btn" style="width:100%">Add service</button></div></form>
+      <datalist id="grpList"></datalist>
+    </div>
+    <div class="card"><h3>Salon products</h3><p class="note">Cost is what she pays; Sell is the price. "+ in" adds stock that arrived to what is on the shelf.</p>
+      <div class="scroll"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Cost</th><th class="n">Sell</th><th class="n">Shelf</th><th></th></tr></thead><tbody id="prodT"></tbody></table></div>
+      <form class="addf" id="addProd"><div><label for="npCode">Code</label><input id="npCode" placeholder="e.g. SC" style="text-transform:uppercase" autocomplete="off"></div><div class="wide"><label for="npName">Product</label><input id="npName" autocomplete="off"></div><div><label for="npCost">Cost (R)</label><input id="npCost" type="number" min="0" inputmode="decimal"></div><div><label for="npPrice">Sell (R)</label><input id="npPrice" type="number" min="0" inputmode="decimal"></div><div><label for="npStock">On shelf</label><input id="npStock" type="number" min="0" inputmode="numeric" value="0"></div><div><button class="btn" style="width:100%">Add product</button></div></form>
+    </div>
+    <div class="card icard"><h3><span class="code i">Icon</span> Icon price list</h3><p class="note">Trade is what she pays Icon; Retail is her selling price. Tap &times; to hide products she never sells.</p>
       <input id="plSearch" type="search" placeholder="Search Icon products" autocomplete="off" aria-label="Search the Icon price list">
-      <div class="scroll" style="max-height:360px;overflow-y:auto"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Trade (R)</th><th class="n">Retail (R)</th></tr></thead><tbody id="iconT"></tbody></table></div>
+      <div class="scroll" style="max-height:380px;overflow-y:auto"><table><thead><tr><th>Code</th><th>Product</th><th class="n">Trade</th><th class="n">Retail</th><th></th></tr></thead><tbody id="iconT"></tbody></table></div>
+      <form class="addf" id="addIcon"><div><label for="niCode">Code</label><input id="niCode" style="text-transform:uppercase" autocomplete="off"></div><div class="wide"><label for="niName">Product</label><input id="niName" autocomplete="off"></div><div><label for="niBrand">Brand</label><input id="niBrand" list="brandList" value="Icon" autocomplete="off"></div><div><label for="niTrade">Trade (R)</label><input id="niTrade" type="number" min="0" inputmode="decimal"></div><div><label for="niRetail">Retail (R)</label><input id="niRetail" type="number" min="0" inputmode="decimal"></div><div><button class="btn ibtn" style="width:100%">Add Icon product</button></div></form>
+      <datalist id="brandList"></datalist>
+    </div>
+    <div class="card"><h3>Taken off the list</h3><div id="removedL"></div></div>
+    <div class="card"><h3>Invoice details</h3><p class="note">Printed on every invoice. Use a new line for each part.</p>
+      <label for="invDet">Her name, address and phone</label><textarea id="invDet" class="ta" rows="4" placeholder="Ultimate Hair and Beauty&#10;12 Main Street, Carletonville&#10;082 000 0000"></textarea>
+      <label for="invSalon">Salon bank details (salon invoices)</label><textarea id="invSalon" class="ta" rows="3" placeholder="ABSA, account 0000000000, branch 632005"></textarea>
+      <label for="invIcon">Icon bank details (Icon invoices)</label><textarea id="invIcon" class="ta" rows="3" placeholder="Capitec, account 0000000000, branch 470010"></textarea>
+      <button type="button" class="btn" id="invSaveSet" style="margin-top:10px">Save invoice details</button>
       <h3 style="margin-top:22px">This phone</h3><p class="note">Refresh pulls the latest from the sheet (after changes made in the sheet itself). Sign out removes the PIN from this phone.</p>
       <div class="chips"><button type="button" class="btn ghost" id="refresh">Refresh from sheet</button><button type="button" class="btn ghost" id="signout">Sign out</button></div></div>
   </div>
 </section>
+<div class="panel" id="invPanel" hidden><div class="card" id="invCard"></div></div>
 </main>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="undo">Undo</button></div>
 <script>
@@ -478,16 +553,33 @@ const accOf = e => e.account === 'Icon' ? 'Icon' : 'Salon';
 const itemOf = (r, c) => r.kind === 'svc' ? svcBy(c) : lineOf(r) === 'Icon' ? iconBy(c) : prodBy(c);
 const nameOf = (r, c) => (itemOf(r, c) || {}).name || c;
 const codeCls = r => r.kind === 'svc' ? '' : lineOf(r) === 'Icon' ? ' i' : ' p';
+const act = x => !!x && x.active !== false;
+/* bookings paid later: a line with no PaidBy is booked; payments against it live in S.payments */
+const NP = 'Not paid yet';
+const payFor = id => (S.payments || []).filter(p => p.saleId === id);
+const paidOf = r => r.pay ? r.amount : payFor(r.id).reduce((a, p) => a + p.amount, 0);
+const owingOf = r => Math.max(0, Math.round((r.amount - paidOf(r)) * 100) / 100);
+const statusOf = r => (r.pay || owingOf(r) <= 0) ? 'paid' : paidOf(r) > 0 ? 'part' : 'booked';
+/* money actually received (paid on the spot, or later payments), by the date it came in */
+function moneyIn(test) {
+  const ev = [], byId = {};
+  for (const r of S.sales) { byId[r.id] = r; if (r.pay && test(r.date)) ev.push({ date: r.date, amount: r.amount, pay: r.pay, r }); }
+  for (const p of S.payments || []) { const r = byId[p.saleId]; if (r && test(p.date)) ev.push({ date: p.date, amount: p.amount, pay: p.pay, r, p: true }); }
+  return ev;
+}
 const parseCodes = s => s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
 const dayRows = d => S.sales.filter(x => x.date === d).sort((a, b) => String(a.time).localeCompare(String(b.time)));
-function totals(rows) {
+function totals(rows, ev) {
   const t = { all: 0, svc: 0, prod: 0, icon: 0, clients: new Set(), L: { Salon: { all: 0, cost: 0 }, Icon: { all: 0, cost: 0 } } };
   for (const p of S.pays) { t[p] = 0; t.L.Salon[p] = 0; t.L.Icon[p] = 0; }
+  for (const e of ev) {
+    const r = e.r, l = lineOf(r), L = t.L[l];
+    t.all += e.amount; t[r.kind === 'svc' ? 'svc' : l === 'Icon' ? 'icon' : 'prod'] += e.amount; t[e.pay] = (t[e.pay] || 0) + e.amount;
+    L.all += e.amount; L[e.pay] = (L[e.pay] || 0) + e.amount;
+  }
   for (const r of rows) {
-    const l = lineOf(r), L = t.L[l];
-    t.all += r.amount; t[r.kind === 'svc' ? 'svc' : l === 'Icon' ? 'icon' : 'prod'] += r.amount; t[r.pay] = (t[r.pay] || 0) + r.amount;
-    L.all += r.amount; L[r.pay] = (L[r.pay] || 0) + r.amount;
-    if (r.kind === 'prod') L.cost += ((itemOf(r, r.codes[0]) || {}).cost || 0) * (r.qty || 1);
+    if (r.date > TODAY()) continue;
+    if (r.kind === 'prod') t.L[lineOf(r)].cost += ((itemOf(r, r.codes[0]) || {}).cost || 0) * (r.qty || 1);
     if (r.kind === 'svc') t.clients.add(r.time + r.client);
   }
   return t;
@@ -499,28 +591,45 @@ function chips(el, list, key, label) {
 document.addEventListener('click', e => { const c = e.target.closest('.chip[data-k]'); if (!c) return; form[c.dataset.k] = c.dataset.v; render(); });
 
 /* ---------- screens ---------- */
+let openRow = '', sheetOpen = false;
 function renderDay() {
-  $('dayTitle').textContent = dname(day) + (day === TODAY() ? ' (today)' : ''); $('dayPick').value = day;
+  $('dayTitle').textContent = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'short' }) + (day === TODAY() ? ' · today' : ''); $('dayPick').value = day;
   if (!$('fTime').value) $('fTime').value = nowTime();
-  const rows = dayRows(day), t = totals(rows);
-  const cashExp = S.exp.filter(e => e.date === day && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
-  const nSvc = rows.filter(r => r.kind === 'svc').length, nProd = rows.filter(r => r.kind === 'prod').reduce((a, r) => a + r.qty, 0);
+  if (!sheetOpen) $('fDate').value = day;
+  const rows = dayRows(day);
+  const nSvc = rows.filter(r => r.kind === 'svc').length, nProd = rows.filter(r => r.kind === 'prod').reduce((a, r) => a + (r.qty || 1), 0);
+  const st = { booked: 0, part: 0, paid: 0 }; for (const r of rows) st[statusOf(r)]++;
   const tm = rows.map(r => r.time).filter(Boolean).sort();
-  $('dayStrip').innerHTML = `<div><small>Clients</small><span class="fig-n">${t.clients.size}</span></div><div><small>Services done</small><span class="fig-n">${nSvc}</span></div><div><small>Products sold</small><span class="fig-n">${nProd}</span></div><div><small>First / last</small><span class="fig-n">${tm.length ? esc(tm[0]) + (tm.length > 1 ? ' \u2013 ' + esc(tm[tm.length - 1]) : '') : '-'}</span></div>`;
+  $('daySum').innerHTML = rows.length ? [`<b>${nSvc}</b> booking${nSvc === 1 ? '' : 's'}`, nProd ? `<b>${nProd}</b> product${nProd === 1 ? '' : 's'}` : '', st.booked ? `<b>${st.booked}</b> not paid` : '', st.part ? `<b>${st.part}</b> part paid` : '', tm.length ? esc(tm[0]) + (tm.length > 1 ? ' – ' + esc(tm[tm.length - 1]) : '') : ''].filter(Boolean).join(' · ') : '';
   const wd = new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short' }).slice(0, 3).toLowerCase();
   const closed = (S.closed || []).some(c => c.slice(0, 3).toLowerCase() === wd);
-  $('dayPage').innerHTML = rows.length ? rows.map(r => `<div class="row${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : (lineOf(r) === 'Icon' ? 'Icon: ' : '') + esc(nameOf(r, r.codes[0])) + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${codeCls(r)}" title="${esc(nameOf(r, c))}">${esc(c)}</span>`).join('')}</span><span class="amt">${M(r.amount)}<span class="pay">${esc(r.pay)}</span></span><button class="x" data-del="${esc(r.id)}" aria-label="Remove line">×</button></div>`).join('')
-    : `<div class="empty">Nothing in the book for this day.${closed ? ' The salon is normally closed on this day.' : ''}</div>`;
-  chips('fStylist', S.stylists, 'stylist'); chips('fPay', S.pays, 'pay');
+  const nowT = nowTime(), nextId = day === TODAY() ? (rows.find(r => r.kind === 'svc' && r.time >= nowT) || {}).id : '';
+  $('dayPage').innerHTML = rows.length ? rows.map(r => rowHtml(r, r.id === nextId)).join('')
+    : `<div class="empty">Nothing booked for this day.${closed ? ' The salon is normally closed on this day.' : ''}<br><button type="button" class="btn" style="margin-top:12px" data-newbk="1">+ New booking</button></div>`;
+  chips('fStylist', S.stylists, 'stylist'); chips('fPay', [NP, ...S.pays], 'pay');
   $('clientList').innerHTML = (S.clients || []).map(c => `<option value="${esc(fullName(c))}">${esc(c.phone)}</option>`).join('');
   const ub = upcomingBdays(7);
   $('dayBdays').hidden = !ub.length;
   $('dayBdays').innerHTML = ub.length ? '🎂 Birthdays: ' + ub.map(o => `<button type="button" class="linkish" data-open="${esc(o.c.id)}"><b>${esc(fullName(o.c))}</b></button> ${esc(bdWhen(o.x))}${o.x.age ? ' (' + o.x.age + ')' : ''}`).join(' · ') : '';
   clientInfo();
-  const groups = [...new Set(S.services.map(s => s.group || 'Other'))];
+  const live = S.services.filter(act), groups = [...new Set(live.map(s => s.group || 'Other'))];
   chips('grpBtns', groups, 'grp');
-  $('codeBtns').innerHTML = S.services.filter(s => (s.group || 'Other') === form.grp).map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)}"><b>${esc(s.code)}</b> ${esc(shortName(s))} <span class="from">${s.varies ? 'from ' : ''}${R(s.price)}</span></button>`).join('');
+  $('codeBtns').innerHTML = live.filter(s => (s.group || 'Other') === form.grp).map(s => `<button type="button" class="chip" data-add="${esc(s.code)}" title="${esc(s.name)}"><b>${esc(s.code)}</b> ${esc(shortName(s))} <span class="from">${s.varies ? 'from ' : ''}${R(s.price)}</span></button>`).join('');
   formPrice();
+  $('addForm').classList.toggle('open', sheetOpen); $('sheetBg').hidden = !sheetOpen;
+}
+function rowHtml(r, next) {
+  const s = statusOf(r), open = openRow === r.id;
+  const payTxt = s === 'paid' ? esc(r.pay || 'Paid') : s === 'part' ? `<span class="stp part">owes ${M(owingOf(r))}</span>` : '<span class="stp booked">not paid</span>';
+  return `<div class="row st-${s}${next ? ' next' : ''}${r.id === lastNew ? ' new' : ''}"><span class="t">${esc(r.time)}</span><span class="who"><button type="button" class="linkish" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}"><b>${esc(r.client || 'Walk-in')}</b></button><span>${r.kind === 'svc' ? esc(r.stylist) : (lineOf(r) === 'Icon' ? 'Icon: ' : '') + esc(nameOf(r, r.codes[0])) + ' x' + r.qty}${r.notes ? ' · ' + esc(r.notes) : ''}</span></span><span class="codes">${r.codes.map(c => `<span class="code${codeCls(r)}" title="${esc(nameOf(r, c))}">${esc(c)}</span>`).join('')}</span><span class="amt">${M(r.amount)}<span class="pay">${payTxt}</span></span><button type="button" class="more" data-act="${esc(r.id)}" aria-expanded="${open}" aria-label="Pay, move, invoice or remove">⋯</button>${open ? actsHtml(r) : ''}</div>`;
+}
+function actsHtml(r) {
+  const owe = owingOf(r), ps = payFor(r.id), id = esc(r.id);
+  let pay = '';
+  if (r.pay) pay = `<div class="arow"><span class="note">Paid by ${esc(r.pay)} when it was written in.</span><button type="button" class="linkish note" data-unpaid="1"><u>Change to not paid</u></button></div>`;
+  else if (owe > 0) pay = `<h4>Take payment</h4><div class="arow"><label class="amtl" style="font-size:18px">R<input type="number" id="payAmt" min="0" step="1" inputmode="decimal" value="${owe}" aria-label="Amount paid"></label><input type="date" id="payDate" value="${TODAY()}" aria-label="Date paid"></div><div class="arow">${S.pays.map(p => `<button type="button" class="btn sm" data-paynow="${esc(p)}">${esc(p)}</button>`).join('')}</div><p class="note" style="margin:0">Still owes ${M(owe)}. For a part payment (half now, the rest at month-end) change the amount first.</p>`;
+  if (ps.length) pay += `<ul class="plist">${ps.map(p => `<li><span>${esc(dshort(p.date))}: paid ${M(p.amount)} ${esc(p.pay)}</span><button type="button" class="rm" data-unpay="${esc(p.id)}" aria-label="Remove this payment">×</button></li>`).join('')}</ul>`;
+  return `<div class="acts">${pay}<h4>Move or change</h4><div class="arow"><input type="date" id="edDate" value="${esc(r.date)}" aria-label="Day"><input type="time" id="edTime" value="${esc(r.time)}" aria-label="Time"><label class="amtl" style="font-size:18px">R<input type="number" id="edAmt" min="0" value="${esc(r.amount)}" aria-label="Price"></label><button type="button" class="btn ghost sm" data-save="1">Save</button></div><div class="arow"><button type="button" class="btn ghost sm" data-inv="1">Invoice (PDF)</button><button type="button" class="btn ghost sm" data-open="${esc(r.clientId || '')}" data-name="${esc(r.client || '')}">Client file</button><button type="button" class="btn ghost sm" data-del="${id}" style="color:var(--berry)">Remove line</button></div></div>`;
 }
 function clientInfo() {
   const n = $('fClient').value.trim(), c = n && clientByName(n);
@@ -573,7 +682,8 @@ function renderClients() {
   const c = clientById(clientSel);
   if (!c) { $('cDetail').innerHTML = '<p class="note">Pick a client to see their history, or add a new client.</p>'; return; }
   const bx = bdNext(c.birthday), missing = !c.phone || !c.birthday;
-  const v = visitsOf(c), svc = v.filter(x => x.kind === 'svc'), tot = v.reduce((a, x) => a + x.amount, 0);
+  const v = visitsOf(c), svc = v.filter(x => x.kind === 'svc'), tot = v.reduce((a, x) => a + x.amount, 0), owe = v.reduce((a, x) => a + owingOf(x), 0);
+  const invs = (S.invoices || []).filter(i => i.clientId ? i.clientId === c.id : norm(i.client) === norm(fullName(c))).sort((a, b) => b.no.localeCompare(a.no));
   const fav = {}; for (const x of svc) for (const code of x.codes) fav[code] = (fav[code] || 0) + 1;
   const favTop = Object.entries(fav).sort((a, b) => b[1] - a[1])[0];
   const gaps = []; for (let i = 0; i < svc.length - 1; i++) gaps.push((new Date(svc[i].date) - new Date(svc[i + 1].date)) / 864e5);
@@ -582,12 +692,13 @@ function renderClients() {
     ${bx && bx.days <= 14 ? `<div class="bdnote">🎂 Birthday ${esc(bdWhen(bx))}${bx.age ? ': turns ' + bx.age : ''}!</div>` : ''}
     ${c.notes ? `<div class="cnote">${esc(c.notes)}</div>` : ''}
     ${(() => { const ln = v.find(x => x.notes); return ln ? `<div class="lastnote"><b>Last visit note (${esc(dshort(ln.date))}, ${esc(ln.codes.join('+'))}):</b>\n${esc(ln.notes)}</div>` : ''; })()}
-    <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${M(tot)}</b></div><div><small>Average visit</small><b>${M(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
+    <div class="stats"><div><small>Visits</small><b>${svc.length}</b></div><div><small>Total spent</small><b>${M(tot)}</b></div>${owe > 0 ? `<div><small>Still owes</small><b style="color:var(--berry)">${M(owe)}</b></div>` : ''}<div><small>Average visit</small><b>${M(svc.length ? svc.reduce((a, x) => a + x.amount, 0) / svc.length : 0)}</b></div><div><small>Comes every</small><b>${every ? every + ' days' : '-'}</b></div><div><small>Usual</small><b>${favTop ? esc(favTop[0]) : '-'}</b>${favTop && svcBy(favTop[0]) ? `<small>${esc(shortName(svcBy(favTop[0])))}</small>` : ''}</div></div>
     <details${missing ? ' open' : ''}><summary class="note" style="cursor:pointer">${missing ? 'Add ' + [!c.phone && 'phone number', !c.birthday && 'birthday'].filter(Boolean).join(' and ') : 'Edit client details'}</summary>
       ${clientForm(c)}
       <button type="button" class="btn" id="cSave" style="margin-top:10px">Save client</button></details>
+    ${invs.length ? `<h3 style="margin:18px 0 4px">Invoices</h3><ul class="plist">${invs.map(i => `<li><span><b>${esc(i.no)}</b> <span class="note">${esc(dshort(i.date))}${i.line === 'Icon' ? ' · Icon' : ''}</span> ${M(i.total)}</span><button type="button" class="btn ghost sm" data-reinv="${esc(i.no)}">PDF</button></li>`).join('')}</ul>` : ''}
     <h3 style="margin:18px 0 4px">History</h3>
-    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${codeCls(x)}">${esc(code)}</span>`).join('')}</span><div>${lineOf(x) === 'Icon' ? 'Icon: ' : ''}${esc(x.codes.map(code => nameOf(x, code)).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${M(x.amount)}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
+    ${v.map(x => `<div class="visit"><div class="d">${esc(dshort(x.date))}<small>${esc(x.date.slice(0, 4))} · ${esc(x.time)}</small></div><div class="what"><span class="codes" style="justify-content:flex-start">${x.codes.map(code => `<span class="code${codeCls(x)}">${esc(code)}</span>`).join('')}</span><div>${lineOf(x) === 'Icon' ? 'Icon: ' : ''}${esc(x.codes.map(code => nameOf(x, code)).join(' + '))}${x.kind === 'prod' ? ' x' + x.qty : ''}</div><small class="note">${esc(x.stylist || '')}${x.stylist ? ' · ' : ''}${esc(x.pay)}</small></div><div class="amt">${M(x.amount)}${statusOf(x) !== 'paid' ? `<br><span class="stp ${statusOf(x)}">${statusOf(x) === 'part' ? 'owes ' + M(owingOf(x)) : 'not paid'}</span>` : ''}</div><div class="vfull">${noteEdit === x.id ? `<div class="nedit"><textarea id="nText" placeholder="e.g. 7.1 + 6% (60g), 30g 6.66 red, 35 min. Next time less red.">${esc(x.notes || '')}</textarea><div class="nrow"><button type="button" class="btn" data-nsave="${esc(x.id)}">Save note</button><button type="button" class="linkish" data-ncancel="1">Cancel</button><button type="button" class="linkish" data-ntpl="1">Use formula layout</button></div></div>` : `${x.notes ? `<div class="vn">${esc(x.notes)}</div>` : ''}${x.kind === 'svc' ? `<button type="button" class="nbtn" data-nedit="${esc(x.id)}">${x.notes ? 'Edit note' : '+ Add note'}</button>` : ''}`}</div></div>`).join('') || '<p class="note">No visits yet.</p>'}`;
   if (draft && $('nText')) { $('nText').value = draft[0]; if (draft[1]) $('nText').focus(); }
 }
 function iconList() {
@@ -595,10 +706,10 @@ function iconList() {
   let list;
   if (!words.length) {
     const cnt = {}; for (const r of S.sales) if (lineOf(r) === 'Icon') cnt[r.codes[0]] = (cnt[r.codes[0]] || 0) + (r.qty || 1);
-    list = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(iconBy).filter(p => p && (br === 'All' || p.brand === br)).slice(0, 10);
-    if (!list.length) list = (S.icon || []).filter(p => br !== 'All' && p.brand === br).slice(0, 40);
+    list = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(iconBy).filter(p => act(p) && (br === 'All' || p.brand === br)).slice(0, 10);
+    if (!list.length) list = (S.icon || []).filter(p => act(p) && br !== 'All' && p.brand === br).slice(0, 40);
   } else {
-    list = (S.icon || []).filter(p => (br === 'All' || p.brand === br) && words.every(w => norm(p.name + ' ' + p.code + ' ' + p.range).includes(w))).slice(0, 40);
+    list = (S.icon || []).filter(p => act(p) && (br === 'All' || p.brand === br) && words.every(w => norm(p.name + ' ' + p.code + ' ' + p.range).includes(w))).slice(0, 40);
   }
   const head = !words.length ? (list.length && br === 'All' ? '<p class="note" style="margin:6px 0">Sold most:</p>' : br === 'All' ? '<p class="note" style="margin:8px 0">Type to search Icon\'s full list of ' + (S.icon || []).length + ' products, or tap a brand.</p>' : '') : list.length ? '' : '<p class="note" style="margin:8px 0">No Icon product matches that.</p>';
   $('iList').innerHTML = head + list.map(p => `<button type="button" class="ii" data-ic="${esc(p.code)}" aria-pressed="${p.code === iconSel}"><span class="code i">${esc(p.code)}</span><span>${esc(p.name)}<small>${esc(p.brand)}${p.range ? ' · ' + esc(p.range) : ''}</small></span><b>${R(p.price)}</b></button>`).join('');
@@ -611,13 +722,13 @@ function iconPrice() {
 function renderShop() {
   $('sBank').textContent = `Salon money: goes to ${BANK('Salon')}.`;
   $('iBank').textContent = `Icon money: kept apart, goes to ${BANK('Icon')}.`;
-  chips('iBrands', ['All', ...new Set((S.icon || []).map(p => p.brand))], 'iBrand'); chips('iPay', S.pays, 'iPay');
+  chips('iBrands', ['All', ...new Set((S.icon || []).filter(act).map(p => p.brand))], 'iBrand'); chips('iPay', [...S.pays, NP], 'iPay');
   iconList(); iconPrice();
-  chips('sProd', S.products.map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', S.pays, 'sPay');
+  chips('sProd', S.products.filter(act).map(p => p.code), 'sProd', c => `<b>${esc(c)}</b> ${esc(prodBy(c).name)}`); chips('sPay', [...S.pays, NP], 'sPay');
   const p = prodBy(form.sProd), q = Math.max(1, +$('sQty').value || 1);
   $('sDesc').textContent = p ? `${p.name} x${q}` : 'No products in the sheet yet'; $('sAmt').textContent = R(p ? p.price * q : 0);
   const m = TODAY().slice(0, 7);
-  $('stockT').innerHTML = S.products.map(p => {
+  $('stockT').innerHTML = S.products.filter(act).map(p => {
     const mine = S.sales.filter(x => x.kind === 'prod' && x.codes[0] === p.code);
     const sold = mine.reduce((a, x) => a + x.qty, 0), msold = mine.filter(x => x.date.startsWith(m)).reduce((a, x) => a + x.qty, 0), left = p.start - sold;
     return `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${R(p.price)}</td><td class="n">${msold}</td><td class="n" style="${left <= 3 ? 'color:var(--berry);font-weight:700' : ''}">${left}${left <= 3 ? ' reorder' : ''}</td></tr>`;
@@ -631,13 +742,16 @@ function renderExp() {
   $('expT').innerHTML = list.map(e => `<tr><td style="white-space:nowrap">${esc(dshort(e.date))}</td><td>${esc(e.desc)}<br><span class="note">${esc(e.pay)}</span></td><td>${esc(e.cat)} <span class="acc ${accOf(e)}">${accOf(e)}</span></td><td class="n">${R(e.amount)}</td><td><button class="x" data-dele="${esc(e.id)}" aria-label="Remove expense">×</button></td></tr>`).join('') || '<tr><td colspan="5" class="note">No expenses this month yet.</td></tr>';
 }
 function bars(el, pairs) { const max = Math.max(1, ...pairs.map(p => p[1])); $(el).innerHTML = pairs.map(([k, v]) => `<div class="b"><span>${esc(k)}</span><span class="track"><span class="fill" style="display:block;width:${(v / max * 100).toFixed(1)}%"></span></span><span class="v">${R(v)}</span></div>`).join('') || '<p class="note">Nothing yet.</p>'; }
-function monthData(m) { const rows = S.sales.filter(x => x.date.startsWith(m)), ex = S.exp.filter(e => e.date.startsWith(m)); return { rows, ex, t: totals(rows), exTot: ex.reduce((a, e) => a + e.amount, 0) }; }
+function monthData(m) { const rows = S.sales.filter(x => x.date.startsWith(m)), ex = S.exp.filter(e => e.date.startsWith(m)), ev = moneyIn(d => String(d).startsWith(m)); return { rows, ex, ev, t: totals(rows, ev), exTot: ex.reduce((a, e) => a + e.amount, 0) }; }
 function renderMonth() {
   const months = [...new Set(S.sales.map(x => x.date.slice(0, 7)).concat(S.exp.map(e => e.date.slice(0, 7)), [TODAY().slice(0, 7)]))].sort().reverse();
   const keep = $('mPick').value;
   $('mPick').innerHTML = months.map(m => `<option value="${esc(m)}">${esc(new Date(m + '-15T12:00:00').toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' }))}</option>`).join('');
   $('mPick').value = months.includes(keep) ? keep : months[0];
-  const m = $('mPick').value, { rows, ex, t, exTot } = monthData(m);
+  const m = $('mPick').value, { rows, ex, ev, t, exTot } = monthData(m);
+  const owed = S.sales.filter(r => r.date <= TODAY() && owingOf(r) > 0).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const ow = k => owed.filter(r => !k || lineOf(r) === k).reduce((a, r) => a + owingOf(r), 0);
+  $('mOwed').innerHTML = owed.length ? `<p class="note" style="margin-top:0">${owed.length} line${owed.length === 1 ? '' : 's'} not fully paid: <b>${R(ow())}</b> still owed (salon ${R(ow('Salon'))}, Icon ${R(ow('Icon'))}). Tap one to take payment.</p><ul class="plist">${owed.map(r => `<li><button type="button" class="linkish" data-goto="${esc(r.id)}"><b>${esc(r.client || 'Walk-in')}</b> <span class="note">${esc(dshort(r.date))} · ${esc(r.codes.join('+'))}${lineOf(r) === 'Icon' ? ' · Icon' : ''}</span></button><b>${R(owingOf(r))}</b></li>`).join('')}</ul>` : '<p class="note">Everything up to today is paid.</p>';
   $('mTitle').textContent = 'Month-end: ' + $('mPick').selectedOptions[0].textContent + (m === TODAY().slice(0, 7) ? ' (to date)' : '');
   $('mTot').textContent = R(t.all);
   const cost = t.L.Salon.cost + t.L.Icon.cost;
@@ -652,14 +766,14 @@ function renderMonth() {
   const sv = {}; for (const r of rows.filter(r => r.kind === 'svc')) { const list = r.codes.map(svcBy).filter(Boolean), base = list.reduce((a, s) => a + s.price, 0) || 1; for (const s of list) sv[s.name] = (sv[s.name] || 0) + r.amount * s.price / base; }
   bars('mSvc', Object.entries(sv).sort((a, b) => b[1] - a[1]).slice(0, 8));
   const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount; bars('mExp', Object.entries(ec).sort((a, b) => b[1] - a[1]));
-  const days = [...new Set(rows.map(r => r.date))].sort();
+  const days = [...new Set(rows.map(r => r.date).concat(ev.map(e => e.date)))].sort();
   const cell = (x, p) => `<td class="n">${R(x[p] || 0)}</td>`;
-  $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td><td class="n">${R(x.icon)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
+  $('mDays').innerHTML = days.map(d => { const x = totals(rows.filter(r => r.date === d), ev.filter(e => e.date === d)); return `<tr><td style="white-space:nowrap">${esc(dshort(d))}</td><td class="n">${x.clients.size}</td><td class="n">${R(x.svc)}</td><td class="n">${R(x.prod)}</td><td class="n">${R(x.icon)}</td>${cell(x, 'Cash')}${cell(x, 'Card')}${cell(x, 'EFT')}<td class="n"><b>${R(x.all)}</b></td></tr>`; }).join('') +
     `<tr><td><b>Total</b></td><td class="n"><b>${t.clients.size}</b></td><td class="n"><b>${R(t.svc)}</b></td><td class="n"><b>${R(t.prod)}</b></td><td class="n"><b>${R(t.icon)}</b></td>${cell(t, 'Cash')}${cell(t, 'Card')}${cell(t, 'EFT')}<td class="n"><b>${R(t.all)}</b></td></tr>`;
 }
 function renderMoneyDay() {
   $('mdTitle').textContent = dname(day) + (day === TODAY() ? ' (today)' : ''); $('mdPick').value = day;
-  const rows = dayRows(day), t = totals(rows);
+  const rows = dayRows(day), t = totals(rows, moneyIn(d => d === day));
   const cashExp = S.exp.filter(e => e.date === day && e.pay === 'Cash').reduce((a, e) => a + e.amount, 0);
   $('mdStrip').innerHTML = `<div class="tot"><small>Day total</small><span class="fig-n">${R(t.all)}</span></div><div><small>Services</small><span class="fig-n">${R(t.svc)}</span></div><div><small>Products</small><span class="fig-n">${R(t.prod)}</span></div>` +
     (S.pays.includes('Cash') ? `<div><small>Cash in till${cashExp ? ' (after cash expenses)' : ''}</small><span class="fig-n">${R((t.Cash || 0) - cashExp)}</span></div>` : '');
@@ -687,10 +801,20 @@ function renderMoney() {
   ({ mday: renderMoneyDay, month: renderMonth, exp: renderExp })[mview]();
 }
 function renderPrices() {
+  $('svcT').innerHTML = S.services.filter(act).map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}${s.varies ? ' <span class="from">(from)</span>' : ''}<br><span class="note">${esc(s.group || '')}</span></td><td class="n"><input type="number" min="0" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td><td><button type="button" class="rm" data-rm="svc:${esc(s.code)}" aria-label="Take ${esc(s.name)} off the list">×</button></td></tr>`).join('');
+  $('grpList').innerHTML = [...new Set(S.services.map(s => s.group).filter(Boolean))].map(g => `<option value="${esc(g)}">`).join('');
+  const sold = code => S.sales.filter(x => x.kind === 'prod' && lineOf(x) === 'Salon' && x.codes[0] === code).reduce((a, x) => a + (x.qty || 1), 0);
+  $('prodT').innerHTML = S.products.filter(act).map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${showMoney ? `<input type="number" min="0" class="cost" data-pc="${esc(p.code)}" value="${esc(p.cost)}" aria-label="Cost of ${esc(p.name)}">` : M(p.cost)}</td><td class="n"><input type="number" min="0" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td><td class="n"><div class="stk"><b>${(p.start || 0) - sold(p.code)}</b><input type="number" min="1" placeholder="+ in" data-stk="${esc(p.code)}" aria-label="Stock that arrived for ${esc(p.name)}"></div></td><td><button type="button" class="rm" data-rm="prod:${esc(p.code)}" aria-label="Take ${esc(p.name)} off the list">×</button></td></tr>`).join('') || '<tr><td colspan="6" class="note">No salon products yet.</td></tr>';
+  $('brandList').innerHTML = [...new Set((S.icon || []).map(p => p.brand))].map(b => `<option value="${esc(b)}">`).join('');
   const pq = norm(plQ).split(' ').filter(Boolean);
-  $('iconT').innerHTML = (S.icon || []).filter(p => pq.every(w => norm(p.name + ' ' + p.code + ' ' + p.brand + ' ' + p.range).includes(w))).map(p => `<tr><td><span class="code i">${esc(p.code)}</span></td><td>${esc(p.name)}<br><span class="note">${esc(p.brand)} · ${esc(p.range)}</span></td><td class="n">${M(p.cost)}</td><td class="n"><input type="number" min="0" data-ip="${esc(p.code)}" value="${esc(p.price)}" aria-label="Retail price for ${esc(p.name)}"></td></tr>`).join('') || '<tr><td colspan="4" class="note">No Icon product matches.</td></tr>';
-  $('svcT').innerHTML = S.services.map(s => `<tr><td><span class="code">${esc(s.code)}</span></td><td>${esc(s.name)}${s.varies ? ' <span class="from">(from)</span>' : ''}</td><td>${esc(s.group)}</td><td class="n"><input type="number" min="0" id="sp-${esc(s.code)}" data-sp="${esc(s.code)}" value="${esc(s.price)}" aria-label="Price for ${esc(s.name)}"></td></tr>`).join('');
-  $('prodT').innerHTML = S.products.map(p => `<tr><td><span class="code p">${esc(p.code)}</span></td><td>${esc(p.name)}</td><td class="n">${M(p.cost)}</td><td class="n"><input type="number" min="0" id="pp-${esc(p.code)}" data-pp="${esc(p.code)}" value="${esc(p.price)}" aria-label="Price for ${esc(p.name)}"></td></tr>`).join('');
+  $('iconT').innerHTML = (S.icon || []).filter(act).filter(p => pq.every(w => norm(p.name + ' ' + p.code + ' ' + p.brand + ' ' + p.range).includes(w))).map(p => `<tr><td><span class="code i">${esc(p.code)}</span></td><td>${esc(p.name)}<br><span class="note">${esc(p.brand)}${p.range ? ' · ' + esc(p.range) : ''}</span></td><td class="n">${showMoney ? `<input type="number" min="0" class="cost" data-icc="${esc(p.code)}" value="${esc(p.cost)}" aria-label="Trade price of ${esc(p.name)}">` : M(p.cost)}</td><td class="n"><input type="number" min="0" data-ip="${esc(p.code)}" value="${esc(p.price)}" aria-label="Retail price for ${esc(p.name)}"></td><td><button type="button" class="rm" data-rm="icon:${esc(p.code)}" aria-label="Hide ${esc(p.name)}">×</button></td></tr>`).join('') || '<tr><td colspan="5" class="note">No Icon product matches.</td></tr>';
+  const li = (k, x) => `<li><span><span class="code${k === 'prod' ? ' p' : k === 'icon' ? ' i' : ''}">${esc(x.code)}</span> ${esc(x.name)}</span><button type="button" class="btn ghost sm" data-back="${k}:${esc(x.code)}">Put back</button></li>`;
+  const gs = S.services.filter(x => !act(x)), gp = S.products.filter(x => !act(x)), gi = (S.icon || []).filter(x => !act(x));
+  $('removedL').innerHTML = (gs.length || gp.length ? `<ul class="plist">${gs.map(x => li('svc', x)).join('')}${gp.map(x => li('prod', x)).join('')}</ul>` : '') +
+    (gi.length ? `<details><summary class="note" style="cursor:pointer">${gi.length} Icon product${gi.length === 1 ? '' : 's'} hidden</summary><ul class="plist">${gi.map(x => li('icon', x)).join('')}</ul></details>` : '') +
+    (gs.length + gp.length + gi.length ? '' : '<p class="note">Nothing taken off. Anything removed with × shows here so it can be put back.</p>');
+  const iv = S.invoice || {};
+  for (const [id, k] of [['invDet', 'details'], ['invSalon', 'Salon'], ['invIcon', 'Icon']]) if (document.activeElement !== $(id) && !$(id).dataset.dirty) $(id).value = iv[k] || '';
 }
 function render() {
   if (!S) return;
@@ -703,7 +827,7 @@ let undoFn = null, toastT;
 function toast(msg, undo) { $('toastMsg').textContent = msg; undoFn = undo; $('undo').hidden = !undo; $('toast').hidden = false; clearTimeout(toastT); toastT = setTimeout(() => $('toast').hidden = true, 5000); }
 $('undo').onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); } $('toast').hidden = true; };
 
-$('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (view === 'money' && b.dataset.v !== 'money' && showMoney) { showMoney = false; clearTimeout(moneyT); eyeBtn(); } view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
+$('tabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; sheetOpen = false; openRow = ''; if (view === 'money' && b.dataset.v !== 'money' && showMoney) { showMoney = false; clearTimeout(moneyT); eyeBtn(); } view = b.dataset.v; for (const x of $('tabs').children) x.setAttribute('aria-selected', x === b); for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-' + view; render(); };
 $('prev').onclick = () => { day = addDays(day, -1); render(); }; $('next').onclick = () => { day = addDays(day, 1); render(); }; $('today').onclick = () => { day = TODAY(); render(); };
 $('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
 $('fClient').oninput = clientInfo;
@@ -722,6 +846,7 @@ $('dayBdays').onclick = e => { const o = e.target.closest('[data-open]'); if (o)
 $('cList').onclick = e => { const b = e.target.closest('[data-cid]'); if (b) { clientSel = b.dataset.cid; noteEdit = ''; render(); const cd = $('cDetail'); if (innerWidth < 760 && cd.scrollIntoView) cd.scrollIntoView({ behavior: 'smooth' }); } };
 $('cDetail').onclick = e => {
   if (e.target.id === 'cCancel') { clientSel = ''; render(); return; }
+  const ri = e.target.closest('[data-reinv]'); if (ri) { const rec = (S.invoices || []).find(i => i.no === ri.dataset.reinv); if (rec) { const ids = rec.saleIds.split(','), ls = S.sales.filter(x => ids.includes(x.id)); deliverPDF(invoicePDF(rec, ls), `Invoice ${rec.no} ${rec.client}`, true); } return; }
   if (e.target.id === 'cAdd') {
     const f = readClientForm(); if (!f) return;
     const dup = clientByName([f.name, f.surname].filter(Boolean).join(' '));
@@ -751,7 +876,7 @@ $('cDetail').onclick = e => {
     for (const x of $('tabs').children) x.setAttribute('aria-selected', x.dataset.v === 'day');
     for (const s of document.querySelectorAll('main>section')) s.hidden = s.id !== 'v-day';
     $('fClient').value = fullName(c); $('fCodes').value = last ? last.codes.join('+') : ''; $('fTime').value = nowTime(); amtTouched = false;
-    render(); const af = $('addForm'); if (af.scrollIntoView) af.scrollIntoView({ behavior: 'smooth' });
+    openSheet(true);
   }
 };
 $('fCodes').oninput = () => { amtTouched = false; formPrice(); };
@@ -773,23 +898,62 @@ function removeSale(id) { const r = S.sales.find(x => x.id === id); if (!r) retu
 $('addForm').onsubmit = e => {
   e.preventDefault();
   const cs = parseCodes($('fCodes').value);
-  if (!cs.length || cs.some(c => !svcBy(c))) { $('fDesc').textContent = cs.length ? 'Fix the unknown code first' : 'Add at least one service code'; return; }
+  if (!cs.length || cs.some(c => !act(svcBy(c)))) { $('fDesc').textContent = cs.length ? 'Fix the unknown code first' : 'Add at least one service code'; return; }
   if (!amtTouched) formPrice();
   const amt = Math.round((+$('fAmtIn').value || 0) * 100) / 100;
   if (amt < 0) { $('fDesc').textContent = 'The amount cannot be negative'; return; }
   const cname = $('fClient').value.trim() || 'Walk-in';
-  const r = { id: newId(), kind: 'svc', date: day, time: $('fTime').value || nowTime(), client: cname, clientId: resolveClient(cname), stylist: form.stylist, codes: cs, qty: 1, amount: amt, pay: form.pay, notes: $('fNotes').value.trim() };
-  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; $('fNotes').value = ''; amtTouched = false; render();
-  toast(`Added ${r.client}, ${R(r.amount)}`, () => removeSale(r.id));
+  const r = { id: newId(), kind: 'svc', date: $('fDate').value || day, time: $('fTime').value || nowTime(), client: cname, clientId: resolveClient(cname), stylist: form.stylist, codes: cs, qty: 1, amount: amt, pay: form.pay === NP ? '' : form.pay, notes: $('fNotes').value.trim() };
+  addSale(r); $('fCodes').value = ''; $('fClient').value = ''; $('fNotes').value = ''; amtTouched = false; sheetOpen = false; day = r.date; render();
+  toast(r.pay ? `Added ${r.client}, ${R(r.amount)} ${r.pay}` : `Booked ${r.client}, ${dshort(r.date)} ${r.time}`, () => removeSale(r.id));
 };
-$('dayPage').onclick = e => { const o = e.target.closest('[data-open]'); if (o) { openClient(o.dataset.open, o.dataset.name); return; } const b = e.target.closest('[data-del]'); if (b) removeSale(b.dataset.del); };
+$('dayPage').onclick = e => {
+  const t = e.target;
+  if (t.closest('[data-newbk]')) { openSheet(); return; }
+  const o = t.closest('[data-open]'); if (o) { openClient(o.dataset.open, o.dataset.name); return; }
+  const a = t.closest('[data-act]'); if (a) { openRow = openRow === a.dataset.act ? '' : a.dataset.act; render(); return; }
+  const r = S.sales.find(x => x.id === openRow);
+  const pn = t.closest('[data-paynow]'); if (pn && r) { takePayment(r, pn.dataset.paynow); return; }
+  const up = t.closest('[data-unpay]'); if (up) { removePayment(up.dataset.unpay); return; }
+  if (t.closest('[data-unpaid]') && r) { const old = r.pay; r.pay = ''; queue('updateSale', { id: r.id, f: { PaidBy: '' } }); render(); toast('Marked as not paid', () => { r.pay = old; queue('updateSale', { id: r.id, f: { PaidBy: old } }); }); return; }
+  if (t.closest('[data-save]') && r) { saveEdit(r); return; }
+  if (t.closest('[data-inv]') && r) { openInvoice(r); return; }
+  const b = t.closest('[data-del]'); if (b) { openRow = ''; removeSale(b.dataset.del); }
+};
+function takePayment(r, method) {
+  const amt = Math.round((parseFloat(String($('payAmt').value).replace(',', '.')) || 0) * 100) / 100, owe = owingOf(r);
+  if (!(amt > 0)) { toast('Type the amount paid'); return; }
+  if (amt > owe + 0.001) { toast('That is more than the ' + R(owe) + ' still owed'); return; }
+  const p = { id: newId(), saleId: r.id, date: $('payDate').value || TODAY(), amount: amt, pay: method };
+  S.payments = S.payments || []; S.payments.push(p); queue('addPayment', p);
+  if (owingOf(r) <= 0) openRow = '';
+  render(); toast(`${r.client || 'Walk-in'} paid ${R(amt)} ${method}${owingOf(r) > 0 ? ', still owes ' + R(owingOf(r)) : ''}`, () => removePayment(p.id, true));
+}
+function removePayment(id, quiet) {
+  const p = (S.payments || []).find(x => x.id === id); if (!p) return;
+  S.payments = S.payments.filter(x => x.id !== id); queue('delPayment', { id }); render();
+  if (!quiet) toast('Payment removed', () => { S.payments.push(p); queue('undelPayment', { id }); });
+}
+function saveEdit(r) {
+  const d = $('edDate').value || r.date, tm = $('edTime').value || r.time, a = Math.max(0, Math.round((+$('edAmt').value || 0) * 100) / 100);
+  const old = { date: r.date, time: r.time, amount: r.amount };
+  Object.assign(r, { date: d, time: tm, amount: a }); queue('updateSale', { id: r.id, f: { Date: d, Time: tm, Amount: a } }); openRow = ''; render();
+  toast(d !== old.date ? `Moved to ${dshort(d)} at ${tm}` : 'Saved', () => { Object.assign(r, old); queue('updateSale', { id: r.id, f: { Date: old.date, Time: old.time, Amount: old.amount } }); });
+}
+function openSheet(prefilled) {
+  sheetOpen = true; $('fDate').value = day; form.pay = NP;
+  if (!prefilled) $('fTime').value = day === TODAY() ? nowTime() : '09:00';
+  render();
+}
+function closeSheet() { sheetOpen = false; render(); }
+$('newBk').onclick = () => openSheet(); $('fClose').onclick = closeSheet; $('sheetBg').onclick = closeSheet;
 $('sQty').oninput = render;
 $('shopForm').onsubmit = e => {
   e.preventDefault();
   const p = prodBy(form.sProd); if (!p) return;
   const q = Math.max(1, +$('sQty').value || 1);
   const sname = $('sClient').value.trim() || 'Walk-in';
-  const r = { id: newId(), kind: 'prod', date: day, time: day === TODAY() ? nowTime() : '12:00', client: sname, clientId: resolveClient(sname), stylist: '', codes: [p.code], qty: q, amount: p.price * q, pay: form.sPay };
+  const r = { id: newId(), kind: 'prod', date: day, time: day === TODAY() ? nowTime() : '12:00', client: sname, clientId: resolveClient(sname), stylist: '', codes: [p.code], qty: q, amount: p.price * q, pay: form.sPay === NP ? '' : form.sPay };
   addSale(r); $('sQty').value = 1; $('sClient').value = ''; render();
   toast(`Sold ${p.name} x${q}, ${R(r.amount)}`, () => removeSale(r.id));
 };
@@ -803,7 +967,7 @@ $('iconForm').onsubmit = e => {
   const q = Math.max(1, +$('iQty').value || 1), amt = Math.round((+$('iAmt').value || 0) * 100) / 100;
   if (amt < 0) { $('iDesc').textContent = 'The amount cannot be negative'; return; }
   const name = $('iClient').value.trim() || 'Walk-in';
-  const r = { id: newId(), kind: 'prod', line: 'Icon', date: day, time: day === TODAY() ? nowTime() : '12:00', client: name, clientId: resolveClient(name), stylist: '', codes: [p.code], qty: q, amount: amt, pay: form.iPay, notes: '' };
+  const r = { id: newId(), kind: 'prod', line: 'Icon', date: day, time: day === TODAY() ? nowTime() : '12:00', client: name, clientId: resolveClient(name), stylist: '', codes: [p.code], qty: q, amount: amt, pay: form.iPay === NP ? '' : form.iPay, notes: '' };
   addSale(r); iconSel = ''; iAmtTouched = false; $('iQty').value = 1; $('iClient').value = ''; render();
   toast(`Icon sale: ${p.name} x${q}, ${R(amt)}`, () => removeSale(r.id));
 };
@@ -823,12 +987,143 @@ $('expT').onclick = e => {
   toast('Expense removed', () => { S.exp.push(x); queue('undelExpense', { id }); });
 };
 $('mPick').onchange = render;
+$('mOwed').onclick = e => { const g = e.target.closest('[data-goto]'); if (!g) return; const r = S.sales.find(x => x.id === g.dataset.goto); if (!r) return; day = r.date; document.querySelector('#tabs [data-v=day]').click(); openRow = r.id; render(); };
 $('v-prices').addEventListener('change', e => {
   const t = e.target, price = Math.max(0, +t.value || 0);
   if (t.dataset.sp) { svcBy(t.dataset.sp).price = price; queue('setPrice', { kind: 'svc', code: t.dataset.sp, price }); toast('Price updated'); }
   if (t.dataset.pp) { prodBy(t.dataset.pp).price = price; queue('setPrice', { kind: 'prod', code: t.dataset.pp, price }); toast('Price updated'); }
   if (t.dataset.ip) { iconBy(t.dataset.ip).price = price; queue('setPrice', { kind: 'icon', code: t.dataset.ip, price }); toast('Icon price updated'); }
+  if (t.dataset.pc) { prodBy(t.dataset.pc).cost = price; queue('setField', { kind: 'prod', code: t.dataset.pc, field: 'Cost', value: price }); toast('Cost updated'); }
+  if (t.dataset.icc) { iconBy(t.dataset.icc).cost = price; queue('setField', { kind: 'icon', code: t.dataset.icc, field: 'Trade', value: price }); toast('Trade price updated'); }
+  if (t.dataset.stk) { const q = Math.round(+t.value || 0), p = prodBy(t.dataset.stk); if (q > 0 && p) { p.start = (p.start || 0) + q; queue('setField', { kind: 'prod', code: p.code, field: 'StartStock', value: q, add: true }); render(); toast(`${q} x ${p.name} added to the shelf`, () => { p.start -= q; queue('setField', { kind: 'prod', code: p.code, field: 'StartStock', value: -q, add: true }); }); } }
 });
+$('v-prices').addEventListener('click', e => {
+  const b = e.target.closest('[data-rm],[data-back]'); if (!b) return;
+  const rm = !!b.dataset.rm, v = b.dataset.rm || b.dataset.back, i = v.indexOf(':'), k = v.slice(0, i), code = v.slice(i + 1);
+  const it = k === 'svc' ? svcBy(code) : k === 'prod' ? prodBy(code) : iconBy(code); if (!it) return;
+  it.active = !rm; queue('setField', { kind: k, code, field: 'Active', value: rm ? 'N' : 'Y' }); render();
+  toast(rm ? `${it.name} taken off the list` : `${it.name} is back on the list`, () => { it.active = rm; queue('setField', { kind: k, code, field: 'Active', value: rm ? 'Y' : 'N' }); });
+});
+const num = id => Math.max(0, Math.round((parseFloat(String($(id).value).replace(',', '.')) || 0) * 100) / 100);
+function addItem(kind, list, by, code, item, f, re) {
+  if (!re.test(code) || !item.name) { toast('Give it a code (letters and numbers) and a name'); return false; }
+  const ex = by(code); if (act(ex)) { toast(`Code ${code} is already used for ${ex.name}`); return false; }
+  if (ex) Object.assign(ex, item, { active: true }); else list.push(Object.assign(item, { code, active: true }));
+  queue('addItem', { kind, code, f }); render(); toast(`${code} ${item.name} added`); return true;
+}
+$('addSvc').onsubmit = e => { e.preventDefault(); const code = $('nsCode').value.trim().toUpperCase(), name = $('nsName').value.trim(), group = $('nsGroup').value.trim() || 'Other', price = num('nsPrice'), varies = $('nsVar').checked;
+  if (addItem('svc', S.services, svcBy, code, { name, group, price, varies }, { Service: name, Group: group, Price: price, Varies: varies ? 'Y' : '' }, /^[A-Z0-9]{1,8}$/)) e.target.reset(); };
+$('addProd').onsubmit = e => { e.preventDefault(); const code = $('npCode').value.trim().toUpperCase(), name = $('npName').value.trim(), cost = num('npCost'), price = num('npPrice'), start = Math.round(num('npStock'));
+  if (addItem('prod', S.products, prodBy, code, { name, cost, price, start }, { Product: name, Cost: cost, Price: price, StartStock: start }, /^[A-Z0-9]{1,8}$/)) e.target.reset(); };
+$('addIcon').onsubmit = e => { e.preventDefault(); S.icon = S.icon || []; const code = $('niCode').value.trim().toUpperCase(), name = $('niName').value.trim(), brand = $('niBrand').value.trim() || 'Icon', cost = num('niTrade'), price = num('niRetail');
+  if (addItem('icon', S.icon, iconBy, code, { name, brand, range: '', cost, price }, { Product: name, Brand: brand, Range: '', Trade: cost, Retail: price }, /^[A-Z0-9][A-Z0-9\-]{0,11}$/)) { e.target.reset(); $('niBrand').value = 'Icon'; } };
+for (const id of ['invDet', 'invSalon', 'invIcon']) $(id).oninput = () => { $(id).dataset.dirty = '1'; };
+$('invSaveSet').onclick = () => {
+  S.invoice = S.invoice || {};
+  for (const [id, k, key] of [['invDet', 'details', 'InvoiceDetails'], ['invSalon', 'Salon', 'SalonBankDetails'], ['invIcon', 'Icon', 'IconBankDetails']]) {
+    const v = $(id).value.trim(); delete $(id).dataset.dirty;
+    if (v !== (S.invoice[k] || '')) { S.invoice[k] = v; queue('setSetting', { key, value: v }); }
+  }
+  toast('Invoice details saved');
+};
+
+/* ---------- invoices: a one-page PDF made on the phone, shared to WhatsApp ---------- */
+let inv = null;
+const fmtD = d => new Date(d + 'T12:00:00').toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+const money = n => 'R ' + (Math.round(n * 100) / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const invDesc = x => x.kind === 'svc' ? x.codes.map(c => nameOf(x, c)).join(' + ') : nameOf(x, x.codes[0]);
+function nextInvNo(line) { const pre = line === 'Icon' ? 'I' : 'S'; const n = Math.max(0, ...(S.invoices || []).filter(i => i.no[0] === pre).map(i => parseInt(i.no.slice(1), 10) || 0)); return pre + String(n + 1).padStart(4, '0'); }
+function openInvoice(r) {
+  const same = S.sales.filter(x => x.date === r.date && (r.clientId ? x.clientId === r.clientId : norm(x.client) === norm(r.client)));
+  inv = { r, same, line: lineOf(r), ids: new Set(same.filter(x => lineOf(x) === lineOf(r)).map(x => x.id)) };
+  renderInv(); $('invPanel').hidden = false;
+}
+function renderInv() {
+  const lines = inv.same.filter(x => lineOf(x) === inv.line), chosen = lines.filter(x => inv.ids.has(x.id));
+  const tot = chosen.reduce((a, x) => a + x.amount, 0), paid = chosen.reduce((a, x) => a + paidOf(x), 0), types = [...new Set(inv.same.map(lineOf))];
+  const iv = S.invoice || {}, miss = [!iv.details && 'her name and address', !iv[inv.line] && (inv.line === 'Icon' ? 'the Icon' : 'the salon') + ' bank details'].filter(Boolean);
+  $('invCard').innerHTML = `<div class="shead"><h3>Invoice for ${esc(inv.r.client || 'Walk-in')}</h3><button type="button" class="x" data-ix="1" aria-label="Close">×</button></div>
+    ${types.length > 1 ? `<div class="chips" style="margin:8px 0">${types.map(l => `<button type="button" class="chip" data-iline="${l}" aria-pressed="${l === inv.line}">${l === 'Icon' ? 'Icon products' : 'Salon'}</button>`).join('')}</div><p class="note">Salon and Icon go on separate invoices, because they are paid into different accounts.</p>` : ''}
+    <p class="note">${esc(dname(inv.r.date))} · invoice ${esc(nextInvNo(inv.line))}</p>
+    <div class="ilines">${lines.map(x => `<label><input type="checkbox" data-iid="${esc(x.id)}"${inv.ids.has(x.id) ? ' checked' : ''}><span>${esc(invDesc(x))}${x.kind === 'prod' ? ' x' + x.qty : ''}</span><span class="n">${R(x.amount)}</span></label>`).join('')}</div>
+    <div class="itot"><span>Total</span><b>${R(tot)}</b>${paid ? `<span>Paid</span><b>${R(paid)}</b>` : ''}<span>${paid >= tot ? 'Fully paid' : 'Balance due'}</span><b>${R(Math.max(0, tot - paid))}</b></div>
+    ${miss.length ? `<p class="note" style="color:var(--berry)">Add ${miss.join(' and ')} under Price list → Invoice details so they print on the invoice.</p>` : ''}
+    <button type="button" class="btn${inv.line === 'Icon' ? ' ibtn' : ''}" style="width:100%" data-ishare="1"${chosen.length ? '' : ' disabled'}>Make PDF and share (WhatsApp)</button>
+    <button type="button" class="btn ghost" style="width:100%;margin-top:8px" data-idl="1"${chosen.length ? '' : ' disabled'}>Download the PDF</button>`;
+}
+$('invPanel').onclick = e => {
+  const t = e.target;
+  if (t === $('invPanel') || t.closest('[data-ix]')) { $('invPanel').hidden = true; return; }
+  const l = t.closest('[data-iline]'); if (l) { inv.line = l.dataset.iline; inv.ids = new Set(inv.same.filter(x => lineOf(x) === inv.line).map(x => x.id)); renderInv(); return; }
+  const c = t.closest('input[data-iid]'); if (c) { if (c.checked) inv.ids.add(c.dataset.iid); else inv.ids.delete(c.dataset.iid); renderInv(); return; }
+  const sh = t.closest('[data-ishare]'), dl = t.closest('[data-idl]');
+  if (sh || dl) issueInvoice(!!sh);
+};
+function issueInvoice(share) {
+  const chosen = inv.same.filter(x => inv.ids.has(x.id) && lineOf(x) === inv.line); if (!chosen.length) return;
+  const r = inv.r, rec = { no: nextInvNo(inv.line), date: TODAY(), clientId: r.clientId || '', client: r.client || 'Walk-in', line: inv.line, saleIds: chosen.map(x => x.id).join(','), total: chosen.reduce((a, x) => a + x.amount, 0) };
+  const bytes = invoicePDF(rec, chosen);
+  S.invoices = S.invoices || []; S.invoices.push(rec); queue('addInvoice', rec);
+  deliverPDF(bytes, `Invoice ${rec.no} ${rec.client}`, share);
+  $('invPanel').hidden = true; toast(`Invoice ${rec.no} made`);
+}
+function deliverPDF(bytes, name, share) {
+  const file = new File([bytes], name.replace(/[^\w\- ]+/g, '').trim() + '.pdf', { type: 'application/pdf' });
+  try { if (share && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: name }).catch(() => {}); return; } } catch (e) {}
+  const url = URL.createObjectURL(file), a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+const pdfText = s => String(s).replace(/[–—]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[•·]/g, '-').replace(/[^\x20-\x7E\xA0-\xFF]/g, '?').replace(/([\\()])/g, '\\$1');
+const tw = (s, size) => [...String(s)].reduce((a, c) => a + ({ ' ': 278, '.': 278, ',': 278, '-': 333, R: 722, I: 278, N: 722, O: 778, V: 667, C: 722, E: 667, A: 667, T: 611, Y: 667, P: 667, D: 722, Q: 778, '!': 278 }[c] || 556), 0) * size / 1000;
+function invoicePDF(rec, lines) {
+  const ops = [], icon = rec.line === 'Icon', accent = icon ? '0.04 0.42 0.44' : '0.56 0.11 0.27', ink = '0.13 0.09 0.11', grey = '0.45 0.38 0.41';
+  const T = (x, y, size, txt, bold, right, col) => { if (right) x -= tw(txt, size); ops.push(`${col || ink} rg BT /${bold ? 'F2' : 'F1'} ${size} Tf ${x.toFixed(1)} ${y.toFixed(1)} Td (${pdfText(txt)}) Tj ET`); };
+  const Ln = (x1, y1, x2, y2) => ops.push(`0.88 0.84 0.85 RG 0.6 w ${x1} ${y1} m ${x2} ${y2} l S`);
+  const Box = (x, y, w, h, col) => ops.push(`${col} rg ${x} ${y} ${w} ${h} re f`);
+  const iv = S.invoice || {}, det = String(iv.details || S.salon || 'Salon').split(/\n/).map(x => x.trim()).filter(Boolean), bank = String(iv[rec.line] || '').split(/\n/).map(x => x.trim()).filter(Boolean);
+  Box(0, 818, 595, 24, accent);
+  let y = 778;
+  T(50, y, 20, det[0], true, false, accent);
+  det.slice(1, 6).forEach((l, i) => T(50, y - 20 - i * 14, 10, l));
+  T(545, y, 24, 'INVOICE', true, true, accent);
+  T(545, y - 22, 10, 'No. ' + rec.no, false, true); T(545, y - 36, 10, 'Date: ' + fmtD(rec.date), false, true);
+  if (icon) T(545, y - 50, 10, 'Icon & Pure Envy products', false, true);
+  y = Math.min(y - 80, y - 34 - Math.min(5, det.length - 1) * 14);
+  T(50, y, 9, 'BILL TO', true, false, grey); T(50, y - 16, 12, rec.client, true);
+  const cl = clientById(rec.clientId); if (cl && cl.phone) T(50, y - 31, 10, cl.phone);
+  y -= 64;
+  Box(50, y - 7, 495, 22, '0.96 0.94 0.95');
+  T(58, y, 9, 'DESCRIPTION', true, false, grey); T(392, y, 9, 'QTY', true, true, grey); T(466, y, 9, 'PRICE', true, true, grey); T(537, y, 9, 'AMOUNT', true, true, grey);
+  y -= 26;
+  let tot = 0, paid = 0, shown = 0;
+  for (const x of lines) {
+    const q = x.kind === 'svc' ? 1 : (x.qty || 1); tot += x.amount; paid += paidOf(x);
+    if (y < 230) continue;
+    T(58, y, 10, (fmtD(x.date).replace(/ \d{4}$/, '') + '   ' + invDesc(x)).slice(0, 68)); T(392, y, 10, String(q), false, true); T(466, y, 10, money(x.amount / q), false, true); T(537, y, 10, money(x.amount), false, true);
+    Ln(50, y - 9, 545, y - 9); y -= 24; shown++;
+  }
+  if (shown < lines.length) { T(58, y, 9, `+ ${lines.length - shown} more line(s) included in the total`, false, false, grey); y -= 20; }
+  y -= 8;
+  T(466, y, 11, 'Total', true, true); T(537, y, 11, money(tot), true, true); y -= 18;
+  if (paid > 0) { T(466, y, 10, 'Paid', false, true); T(537, y, 10, '- ' + money(paid), false, true); y -= 18; }
+  const due = Math.max(0, tot - paid);
+  Box(335, y - 9, 210, 26, accent); T(345, y, 12, due > 0.001 ? 'Balance due' : 'PAID IN FULL', true, false, '1 1 1'); T(537, y, 12, money(due), true, true, '1 1 1');
+  y -= 56;
+  if (bank.length) { T(50, y, 9, 'PAYMENT DETAILS', true, false, grey); bank.slice(0, 5).forEach((l, i) => T(50, y - 16 - i * 14, 10, l)); T(50, y - 16 - Math.min(5, bank.length) * 14, 10, 'Reference: ' + rec.no, true); }
+  T(297.5 - tw('Thank you!', 12) / 2, 60, 12, 'Thank you!', true, false, accent);
+  return pdfBytes(ops.join('\n'));
+}
+function pdfBytes(content) {
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+    `<< /Length ${content.length} >>\nstream\n${content}\nendstream`];
+  let out = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n'; const off = [];
+  objs.forEach((o, i) => { off.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const x = out.length;
+  out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + off.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF\n`;
+  return Uint8Array.from(out, c => c.charCodeAt(0) & 255);
+}
 $('refresh').onclick = () => { lastErr = ''; load().then(ok => toast(ok ? 'Up to date with the sheet' : 'Could not refresh right now')); };
 $('signout').onclick = () => { if (outbox.length) { toast('Wait until everything is saved before signing out'); return; } signOut(); };
 
@@ -842,7 +1137,7 @@ $('cpSum').onclick = () => {
   const ec = {}; for (const e of ex) ec[e.cat] = (ec[e.cat] || 0) + e.amount;
   const sx = ex.filter(e => accOf(e) === 'Salon'), sec = {}; for (const e of sx) sec[e.cat] = (sec[e.cat] || 0) + e.amount;
   const st = t.L.Salon, sxt = sx.reduce((a, e) => a + e.amount, 0);
-  copyOut([`${S.salon} - ${name}`, '', `SALON (${BANK('Salon')})`, `Services: ${R(t.svc)}`, `Salon products: ${R(t.prod)}`, `Salon takings: ${R(st.all)}`, '  ' + S.pays.map(p => `${p} ${R(st[p] || 0)}`).join(' | '), `Clients: ${t.clients.size}`, `Salon expenses: ${R(sxt)}`, ...Object.entries(sec).map(([k, v]) => `  ${k}: ${R(v)}`), '', ...iconSummary(m, false)].join('\n'), 'Summary');
+  copyOut([`${S.salon} - ${name}`, '', `SALON (${BANK('Salon')})`, `Services: ${R(t.svc)}`, `Salon products: ${R(t.prod)}`, `Salon takings: ${R(st.all)}`, '  ' + S.pays.map(p => `${p} ${R(st[p] || 0)}`).join(' | '), `Clients: ${t.clients.size}`, `Still owed by clients (salon, all dates): ${R(S.sales.filter(r => r.date <= TODAY() && lineOf(r) === 'Salon').reduce((a, r) => a + owingOf(r), 0))}`, `Salon expenses: ${R(sxt)}`, ...Object.entries(sec).map(([k, v]) => `  ${k}: ${R(v)}`), '', ...iconSummary(m, false)].join('\n'), 'Summary');
 };
 function iconSummary(m, head) {
   const { rows, ex, t } = monthData(m), name = $('mPick').selectedOptions[0].textContent, ic = t.L.Icon;
@@ -853,9 +1148,10 @@ function iconSummary(m, head) {
 $('cpIcon').onclick = () => { copyOut(iconSummary($('mPick').value, true).join('\n'), 'Icon summary');
 };
 $('cpCsv').onclick = () => {
-  const m = $('mPick').value, { rows, ex } = monthData(m), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  const m = $('mPick').value, { rows, ex, ev } = monthData(m), q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
   const lines = ['Account,Type,Date,Time,Client,Stylist,Codes,Description,Qty,Amount,Paid by,Notes',
-    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [lineOf(r), r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => nameOf(r, c)).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay, q(r.notes || '')].join(',')),
+    ...rows.slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).map(r => [lineOf(r), r.kind === 'svc' ? 'Service' : 'Product', r.date, r.time, q(r.client), q(r.stylist), r.codes.join('+'), q(r.codes.map(c => nameOf(r, c)).join(' + ')), r.qty || 1, r.amount.toFixed(2), r.pay || (statusOf(r) === 'booked' ? 'Not paid' : 'Part paid'), q(r.notes || '')].join(',')),
+    ...ev.filter(e => e.p).sort((a, b) => a.date.localeCompare(b.date)).map(e => [lineOf(e.r), 'Payment', e.date, '', q(e.r.client), '', e.r.codes.join('+'), q('Payment for ' + e.r.date + ' ' + e.r.codes.join('+')), 1, e.amount.toFixed(2), e.pay, ''].join(',')),
     ...ex.slice().sort((a, b) => a.date.localeCompare(b.date)).map(e => [accOf(e), 'Expense', e.date, '', '', '', q(e.cat), q(e.desc), 1, (-e.amount).toFixed(2), e.pay, ''].join(','))];
   copyOut(lines.join('\n'), 'All lines');
 };
